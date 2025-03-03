@@ -5,18 +5,29 @@ import { Button } from '@/components/ui/button';
 import { PenLine } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Review } from '@/types/review';
 
 interface ReviewStatsProps {
-  stats: {
-    average: number;
-    total: number;
-    distribution: number[];
-  };
-  onWriteReview: () => void;
+  reviews: Review[];
+  onWriteReview?: () => void;
   className?: string;
 }
 
-const ReviewStats = ({ stats, onWriteReview, className }: ReviewStatsProps) => {
+const ReviewStats = ({ reviews, onWriteReview, className }: ReviewStatsProps) => {
+  // Calculate stats from reviews array
+  const total = reviews.length;
+  const average = total > 0 
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / total 
+    : 0;
+  
+  // Calculate distribution
+  const distribution = [0, 0, 0, 0, 0]; // [5-star, 4-star, 3-star, 2-star, 1-star]
+  reviews.forEach(review => {
+    if (review.rating >= 1 && review.rating <= 5) {
+      distribution[5 - review.rating]++;
+    }
+  });
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -27,9 +38,9 @@ const ReviewStats = ({ stats, onWriteReview, className }: ReviewStatsProps) => {
       <div className="bg-white shadow-md rounded-lg p-6">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <div className="text-center md:border-r md:pr-6 pb-4 md:pb-0">
-            <h3 className="text-3xl font-bold">{stats.average.toFixed(1)}</h3>
-            <StarRating rating={stats.average} size={24} className="justify-center my-2" />
-            <p className="text-sm text-muted-foreground">{stats.total} reviews</p>
+            <h3 className="text-3xl font-bold">{average.toFixed(1)}</h3>
+            <StarRating rating={average} size={24} className="justify-center my-2" />
+            <p className="text-sm text-muted-foreground">{total} reviews</p>
           </div>
           
           <div className="flex-1 w-full space-y-2">
@@ -42,25 +53,27 @@ const ReviewStats = ({ stats, onWriteReview, className }: ReviewStatsProps) => {
                   </svg>
                 </div>
                 <Progress 
-                  value={stats.distribution[star - 1] / stats.total * 100} 
+                  value={distribution[5 - star] / total * 100 || 0} 
                   className="h-2 flex-1" 
                 />
                 <span className="text-sm text-muted-foreground w-12 text-right">
-                  {stats.distribution[star - 1]}
+                  {distribution[5 - star]}
                 </span>
               </div>
             ))}
           </div>
           
-          <div className="md:border-l md:pl-6">
-            <Button 
-              onClick={onWriteReview}
-              className="bg-book-orange hover:bg-book-orange/90 text-white shadow-lg transition-all duration-300 hover:shadow-xl"
-            >
-              <PenLine className="mr-2 h-4 w-4" />
-              Write a Review
-            </Button>
-          </div>
+          {onWriteReview && (
+            <div className="md:border-l md:pl-6">
+              <Button 
+                onClick={onWriteReview}
+                className="bg-book-orange hover:bg-book-orange/90 text-white shadow-lg transition-all duration-300 hover:shadow-xl"
+              >
+                <PenLine className="mr-2 h-4 w-4" />
+                Write a Review
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

@@ -8,48 +8,34 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface ReviewFiltersProps {
-  onFilterChange: (filters: {
-    rating: number | null;
-    sort: 'newest' | 'oldest' | 'highest' | 'lowest';
-    verified: boolean;
-    search: string;
-  }) => void;
+  activeFilter: string;
+  onFilterChange: (filter: string) => void;
+  reviewCounts: {
+    all: number;
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
   className?: string;
 }
 
-const ReviewFilters = ({ onFilterChange, className }: ReviewFiltersProps) => {
-  const [rating, setRating] = useState<number | null>(null);
+const ReviewFilters = ({ activeFilter, onFilterChange, reviewCounts, className }: ReviewFiltersProps) => {
   const [sort, setSort] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
   const [verified, setVerified] = useState(false);
   const [search, setSearch] = useState('');
 
-  const handleRatingChange = (newRating: number | null) => {
-    setRating(newRating);
-    onFilterChange({ rating: newRating, sort, verified, search });
-  };
-
-  const handleSortChange = (newSort: 'newest' | 'oldest' | 'highest' | 'lowest') => {
-    setSort(newSort);
-    onFilterChange({ rating, sort: newSort, verified, search });
-  };
-
-  const handleVerifiedChange = () => {
-    const newVerified = !verified;
-    setVerified(newVerified);
-    onFilterChange({ rating, sort, verified: newVerified, search });
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-    onFilterChange({ rating, sort, verified, search: e.target.value });
+    // For now, we're not implementing search functionality
   };
 
   const clearFilters = () => {
-    setRating(null);
+    onFilterChange('all');
     setSort('newest');
     setVerified(false);
     setSearch('');
-    onFilterChange({ rating: null, sort: 'newest', verified: false, search: '' });
   };
 
   return (
@@ -74,7 +60,7 @@ const ReviewFilters = ({ onFilterChange, className }: ReviewFiltersProps) => {
           <div className="flex flex-wrap gap-3">
             <Select
               value={sort}
-              onValueChange={(value) => handleSortChange(value as any)}
+              onValueChange={(value) => setSort(value as any)}
             >
               <SelectTrigger className="w-[160px]">
                 <Filter className="h-4 w-4 mr-2" />
@@ -96,14 +82,14 @@ const ReviewFilters = ({ onFilterChange, className }: ReviewFiltersProps) => {
                   size="sm"
                   className={cn(
                     "flex items-center gap-1 px-2 h-10",
-                    rating === star && "bg-book-orange/10 text-book-orange"
+                    activeFilter === star.toString() && "bg-book-orange/10 text-book-orange"
                   )}
-                  onClick={() => handleRatingChange(rating === star ? null : star)}
+                  onClick={() => onFilterChange(activeFilter === star.toString() ? 'all' : star.toString())}
                 >
                   <Star 
                     className={cn(
                       "h-4 w-4", 
-                      rating === star ? "fill-book-orange text-book-orange" : "text-muted-foreground"
+                      activeFilter === star.toString() ? "fill-book-orange text-book-orange" : "text-muted-foreground"
                     )} 
                   />
                   <span>{star}</span>
@@ -118,7 +104,7 @@ const ReviewFilters = ({ onFilterChange, className }: ReviewFiltersProps) => {
                 "h-10 w-10",
                 verified && "bg-book-orange/10 text-book-orange border-book-orange"
               )}
-              onClick={handleVerifiedChange}
+              onClick={() => setVerified(!verified)}
               title="Verified Purchases Only"
             >
               <Check className="h-4 w-4" />

@@ -137,7 +137,7 @@ const ReviewsPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
               <div className="mb-8">
-                <ReviewStats reviews={reviews} />
+                <ReviewStats reviews={reviews} onWriteReview={() => setShowForm(!showForm)} />
               </div>
               
               <div className="mb-8">
