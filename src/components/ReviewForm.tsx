@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import StarRating from './StarRating';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Review } from '@/types/review';
+import { cn } from '@/lib/utils';
 
 interface ReviewFormProps {
   onSubmit: (review: Omit<Review, 'id' | 'created_at'>) => Promise<void>;
