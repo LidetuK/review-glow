@@ -73,7 +73,7 @@ const StarRating = ({
           <Star 
             size={size} 
             className={cn(
-              "absolute top-0 left-0 text-book-orange overflow-hidden transition-all duration-300",
+              "absolute top-0 left-0 text-yellow-500 overflow-hidden transition-all duration-300",
               (hoverRating || animatedRating) >= star ? "w-full" : "w-0"
             )}
             style={{ 

@@ -48,13 +48,13 @@ const ReviewStats = ({ reviews, onWriteReview, className }: ReviewStatsProps) =>
               <div key={star} className="flex items-center gap-3">
                 <div className="flex items-center w-12">
                   <span className="text-sm font-medium">{star}</span>
-                  <svg className="w-4 h-4 text-book-orange ml-1" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 text-yellow-500 ml-1" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
                   </svg>
                 </div>
                 <Progress 
                   value={distribution[5 - star] / total * 100 || 0} 
-                  className="h-2 flex-1" 
+                  className="h-2 flex-1 bg-gray-100" 
                 />
                 <span className="text-sm text-muted-foreground w-12 text-right">
                   {distribution[5 - star]}
@@ -67,7 +67,7 @@ const ReviewStats = ({ reviews, onWriteReview, className }: ReviewStatsProps) =>
             <div className="md:border-l md:pl-6">
               <Button 
                 onClick={onWriteReview}
-                className="bg-book-orange hover:bg-book-orange/90 text-white shadow-lg transition-all duration-300 hover:shadow-xl"
+                className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg transition-all duration-300 hover:shadow-xl"
               >
                 <PenLine className="mr-2 h-4 w-4" />
                 Write a Review
