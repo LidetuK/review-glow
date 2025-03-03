@@ -14,6 +14,7 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          review_text: string | null
           review_username: string
           score: number | null
           title: string
@@ -22,6 +23,7 @@ export type Database = {
           created_at?: string | null
           email: string
           id?: string
+          review_text?: string | null
           review_username: string
           score?: number | null
           title: string
@@ -30,6 +32,7 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          review_text?: string | null
           review_username?: string
           score?: number | null
           title?: string

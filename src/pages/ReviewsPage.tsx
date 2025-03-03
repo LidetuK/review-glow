@@ -112,6 +112,16 @@ const ReviewsPage = () => {
     ? reviews 
     : reviews.filter(review => review.rating === parseInt(filter, 10));
 
+  // Create reviewCounts object for filters
+  const reviewCounts = {
+    all: reviews.length,
+    5: reviews.filter(r => r.rating === 5).length,
+    4: reviews.filter(r => r.rating === 4).length,
+    3: reviews.filter(r => r.rating === 3).length,
+    2: reviews.filter(r => r.rating === 2).length,
+    1: reviews.filter(r => r.rating === 1).length,
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -134,14 +144,7 @@ const ReviewsPage = () => {
                 <ReviewFilters
                   activeFilter={filter}
                   onFilterChange={setFilter}
-                  reviewCounts={{
-                    all: reviews.length,
-                    5: reviews.filter(r => r.rating === 5).length,
-                    4: reviews.filter(r => r.rating === 4).length,
-                    3: reviews.filter(r => r.rating === 3).length,
-                    2: reviews.filter(r => r.rating === 2).length,
-                    1: reviews.filter(r => r.rating === 1).length,
-                  }}
+                  reviewCounts={reviewCounts}
                 />
               </div>
               
