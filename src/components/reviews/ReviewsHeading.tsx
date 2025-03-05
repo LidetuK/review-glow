@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { Review } from '@/types/review';
 import StarRating from '../StarRating';
@@ -17,29 +18,22 @@ const ReviewsHeading = ({ reviews }: ReviewsHeadingProps) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="text-center"
+      className="text-center mb-10"
     >
-      {/* Main Heading with gradient text */}
-      <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-        Reader Reviews
+      {/* Main Heading with count and title */}
+      <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white">
+        {reviews.length}
       </h1>
+      <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white mt-2">
+        CUSTOMER REVIEWS
+      </h2>
       
-      {/* Conditional Rendering of Rating and Reviews */}
+      {/* Stars */}
       {reviews.length > 0 && (
-        <div className="mt-4 flex flex-col items-center space-y-2">
-          <div className="flex items-center gap-3">
-            {/* Display Average Rating */}
-            <span className="text-4xl font-semibold text-indigo-600">{average.toFixed(1)}</span>
-            <StarRating rating={average} size={24} />
-            {/* Reviews Count */}
-            <span className="text-sm text-gray-500">({reviews.length} reviews)</span>
-          </div>
-          {/* Dynamic Title for Reviews */}
-          <p className="mt-4 text-xl text-gray-700 font-medium max-w-2xl mx-auto">
-            {average >= 4 
-              ? "See why readers love 'Elevate Higher' and join the conversation!" 
-              : "Discover honest opinions and share your thoughts on 'Elevate Higher'"}
-          </p>
+        <div className="mt-4 flex justify-center">
+          <StarRating rating={average} size={20} />
+          <span className="ml-2 text-yellow-500 font-medium">{average.toFixed(1)} out of 5.0</span>
+          <span className="ml-4 bg-red-500 text-white text-xs px-2 py-1 rounded">WRITE A REVIEW</span>
         </div>
       )}
 

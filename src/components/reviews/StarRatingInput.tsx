@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StarRating from '../StarRating';
 import { Label } from '@/components/ui/label';
@@ -13,7 +12,7 @@ interface StarRatingInputProps {
 const StarRatingInput = ({ rating, onChange, error }: StarRatingInputProps) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="rating" className="flex items-center">
+      <Label htmlFor="rating" className="flex items-center text-gray-300">
         Rating <span className="text-red-500 ml-1">*</span>
       </Label>
       <div className="flex items-center gap-2">
@@ -24,7 +23,7 @@ const StarRatingInput = ({ rating, onChange, error }: StarRatingInputProps) => {
           interactive={true} 
           className={error ? "animate-shake" : ""}
         />
-        <span className="text-sm text-muted-foreground ml-2">
+        <span className="text-sm text-gray-400 ml-2">
           {rating > 0 ? `${rating} out of 5 stars` : "Select a rating"}
         </span>
       </div>

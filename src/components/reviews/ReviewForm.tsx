@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Review } from '@/types/review';
@@ -93,44 +93,19 @@ const ReviewForm = ({ onSubmit }: ReviewFormProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <Card className="shadow-lg border-0 bg-white">
+      <Card className="border-0 bg-gray-900 text-white shadow-xl">
         <CardHeader className="pb-3">
-          <CardTitle className="text-2xl font-bold">Write a Review</CardTitle>
-          <CardDescription>Share your thoughts about this book</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center text-white">Write a Review</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <StarRatingInput 
               rating={rating}
               onChange={setRating}
               error={errors.rating}
             />
             
-            <FormField
-              id="title"
-              label="Review Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              error={errors.title}
-              errorMessage="Please provide a title for your review"
-              required
-              placeholder="Summarize your experience in a short title"
-            />
-            
-            <FormField
-              id="content"
-              label="Review"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              error={errors.content}
-              errorMessage="Please share your thoughts in the review"
-              required
-              placeholder="Share your experience with this book"
-              multiline
-              className="min-h-[120px]"
-            />
-            
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 id="name"
                 label="Your Name"
@@ -140,6 +115,7 @@ const ReviewForm = ({ onSubmit }: ReviewFormProps) => {
                 errorMessage="Name is required"
                 required
                 placeholder="Enter your name"
+                darkMode
               />
               
               <FormField
@@ -152,20 +128,43 @@ const ReviewForm = ({ onSubmit }: ReviewFormProps) => {
                 errorMessage="Please enter a valid email"
                 required
                 placeholder="Enter your email"
+                darkMode
               />
             </div>
             
+            <FormField
+              id="title"
+              label="Review Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              error={errors.title}
+              errorMessage="Please provide a title for your review"
+              required
+              placeholder="Summarize your experience in a short title"
+              darkMode
+            />
+            
+            <FormField
+              id="content"
+              label="Review"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              error={errors.content}
+              errorMessage="Please share your thoughts in the review"
+              required
+              placeholder="Share your experience with this book"
+              multiline
+              className="min-h-[100px]"
+              darkMode
+            />
+            
             <Button 
               type="submit" 
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded transition-all"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded transition-all"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Submit Review"}
             </Button>
-            
-            <p className="text-center text-sm text-muted-foreground">
-              By submitting, you agree to our <a href="#" className="text-purple-600 underline">Terms of Service</a>
-            </p>
           </form>
         </CardContent>
       </Card>

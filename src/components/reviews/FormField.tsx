@@ -17,6 +17,7 @@ interface FormFieldProps {
   type?: string;
   multiline?: boolean;
   className?: string;
+  darkMode?: boolean;
 }
 
 const FormField = ({ 
@@ -30,11 +31,12 @@ const FormField = ({
   placeholder = '', 
   type = 'text',
   multiline = false,
-  className = ''
+  className = '',
+  darkMode = false
 }: FormFieldProps) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="flex items-center">
+      <Label htmlFor={id} className={`flex items-center ${darkMode ? 'text-gray-300' : ''}`}>
         {label} {required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       
@@ -46,6 +48,7 @@ const FormField = ({
           className={cn(
             "resize-none",
             error ? "border-red-500" : "",
+            darkMode ? "bg-gray-800 border-gray-700 text-white placeholder:text-gray-500" : "",
             className
           )}
           placeholder={placeholder}
@@ -56,7 +59,10 @@ const FormField = ({
           type={type}
           value={value}
           onChange={onChange}
-          className={error ? "border-red-500" : ""}
+          className={cn(
+            error ? "border-red-500" : "",
+            darkMode ? "bg-gray-800 border-gray-700 text-white placeholder:text-gray-500" : ""
+          )}
           placeholder={placeholder}
         />
       )}

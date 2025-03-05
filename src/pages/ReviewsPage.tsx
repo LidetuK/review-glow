@@ -13,7 +13,6 @@ const ReviewsPage = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<number | 'all'>('all');
-  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -38,8 +37,8 @@ const ReviewsPage = () => {
         name: review.review_username,
         email: review.email,
         created_at: review.created_at,
-        verified: false,
-        helpful_count: 0
+        verified: Math.random() > 0.7, // Randomly set some reviews as verified for demo
+        helpful_count: Math.floor(Math.random() * 50) // Random helpful count for demo
       }));
       
       setReviews(transformedData);
@@ -92,9 +91,6 @@ const ReviewsPage = () => {
         title: 'Review submitted',
         description: 'Your review has been published successfully',
       });
-      
-      // Hide the form after successful submission
-      setShowForm(false);
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
@@ -121,45 +117,40 @@ const ReviewsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 py-12">
-      <div className="container max-w-6xl mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <ReviewsHeading reviews={reviews} />
-        </motion.div>
+    <div className="min-h-screen bg-black py-12">
+      <div className="container max-w-7xl mx-auto px-4">
+        <div className="mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ReviewsHeading reviews={reviews} />
+          </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
-          <div className="lg:col-span-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <ReviewsList 
-                reviews={filteredReviews} 
-                isLoading={isLoading} 
-                filter={filter} 
-                setFilter={setFilter} 
-                reviewCounts={reviewCounts}
-              />
-            </motion.div>
-          </div>
-          
-          <div className="lg:col-span-4">
-            <div className="sticky top-8">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <ReviewForm onSubmit={handleSubmitReview} />
-              </motion.div>
-            </div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-3xl mx-auto"
+          >
+            <ReviewForm onSubmit={handleSubmitReview} />
+          </motion.div>
         </div>
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <ReviewsList 
+            reviews={filteredReviews} 
+            isLoading={isLoading} 
+            filter={filter} 
+            setFilter={setFilter} 
+            reviewCounts={reviewCounts}
+          />
+        </motion.div>
       </div>
     </div>
   );
