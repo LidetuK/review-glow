@@ -113,9 +113,11 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
         </div>
       ) : reviews.length > 0 ? (
         <>
-          <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
+          <div className="w-full overflow-hidden">
+            <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
+          </div>
           
-          {false && totalPages > 1 && (
+          {false && (
             <motion.div 
               className="flex justify-center items-center gap-2 mt-8"
               initial={{ opacity: 0 }}

@@ -14,8 +14,8 @@ interface ReviewsSectionProps {
 
 const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionProps) => {
   return (
-    <section className="py-16 bg-black">
-      <div className="container max-w-6xl mx-auto px-4">
+    <section className="py-16 bg-gray-900">
+      <div className="container max-w-7xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -24,20 +24,22 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
           <ReviewsHeading reviews={reviews} />
         </motion.div>
 
-        <div className="mt-12 mb-16">
+        <div className="mt-10 mb-16">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="w-full"
           >
+            {/* Review form */}
             <ReviewForm onSubmit={onSubmitReview} />
           </motion.div>
         </div>
-        
-        <div className="mt-16">
-          <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
-        </div>
+      </div>
+      
+      {/* Full-width testimonial carousel */}
+      <div className="w-full overflow-hidden px-4 mt-16">
+        <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
       </div>
     </section>
   );

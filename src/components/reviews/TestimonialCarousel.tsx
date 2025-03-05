@@ -11,9 +11,11 @@ interface TestimonialCarouselProps {
 }
 
 const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndexTop, setCurrentIndexTop] = useState(0);
+  const [currentIndexBottom, setCurrentIndexBottom] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const autoPlayIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const autoPlayIntervalTopRef = useRef<NodeJS.Timeout | null>(null);
+  const autoPlayIntervalBottomRef = useRef<NodeJS.Timeout | null>(null);
   
   // Number of cards to show based on viewport
   const getCardsToShow = () => {
@@ -27,6 +29,17 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   
+  // Split reviews for top and bottom rows
+  const splitReviews = () => {
+    const midpoint = Math.ceil(reviews.length / 2);
+    return {
+      topRow: reviews.slice(0, midpoint),
+      bottomRow: reviews.slice(midpoint)
+    };
+  };
+  
+  const { topRow, bottomRow } = splitReviews();
+  
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -37,36 +50,39 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Set up auto-play
+  // Set up auto-play for top row
   useEffect(() => {
-    if (isAutoPlaying) {
-      autoPlayIntervalRef.current = setInterval(() => {
-        nextSlide();
+    if (isAutoPlaying && topRow.length > cardsToShow) {
+      autoPlayIntervalTopRef.current = setInterval(() => {
+        setCurrentIndexTop((prevIndex) => (prevIndex + 1) % (topRow.length - cardsToShow + 1));
       }, 5000);
     }
     
     return () => {
-      if (autoPlayIntervalRef.current) {
-        clearInterval(autoPlayIntervalRef.current);
+      if (autoPlayIntervalTopRef.current) {
+        clearInterval(autoPlayIntervalTopRef.current);
       }
     };
-  }, [currentIndex, isAutoPlaying, reviews.length]);
+  }, [currentIndexTop, isAutoPlaying, topRow.length, cardsToShow]);
+  
+  // Set up auto-play for bottom row, slightly offset in timing
+  useEffect(() => {
+    if (isAutoPlaying && bottomRow.length > cardsToShow) {
+      autoPlayIntervalBottomRef.current = setInterval(() => {
+        setCurrentIndexBottom((prevIndex) => (prevIndex + 1) % (bottomRow.length - cardsToShow + 1));
+      }, 6000); // Different timing for visual interest
+    }
+    
+    return () => {
+      if (autoPlayIntervalBottomRef.current) {
+        clearInterval(autoPlayIntervalBottomRef.current);
+      }
+    };
+  }, [currentIndexBottom, isAutoPlaying, bottomRow.length, cardsToShow]);
   
   // Pause auto-play on hover
   const pauseAutoPlay = () => setIsAutoPlaying(false);
   const resumeAutoPlay = () => setIsAutoPlaying(true);
-  
-  const nextSlide = () => {
-    if (reviews.length <= cardsToShow) return;
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % (reviews.length - cardsToShow + 1));
-  };
-  
-  const prevSlide = () => {
-    if (reviews.length <= cardsToShow) return;
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? reviews.length - cardsToShow : prevIndex - 1
-    );
-  };
   
   // Animation variants
   const containerVariants = {
@@ -97,80 +113,81 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   return (
     <div 
-      className="relative overflow-hidden py-8 px-4 -mx-4"
+      className="relative overflow-hidden py-2"
       onMouseEnter={pauseAutoPlay}
       onMouseLeave={resumeAutoPlay}
     >
-      {/* Navigation buttons */}
-      {reviews.length > cardsToShow && (
-        <>
-          <button 
-            onClick={prevSlide}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full"
-            aria-label="Previous testimonial"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          
-          <button 
-            onClick={nextSlide}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full"
-            aria-label="Next testimonial"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </>
-      )}
-      
-      {/* Carousel container */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="w-full overflow-hidden"
-      >
-        <motion.div 
-          className="flex transition-all duration-500 ease-out"
-          animate={{
-            x: `-${currentIndex * (100 / cardsToShow)}%`
-          }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      {/* Top row */}
+      <div className="mb-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full overflow-hidden"
         >
-          {reviews.map((review, index) => (
-            <motion.div 
-              key={review.id} 
-              className={`w-full px-4 flex-shrink-0`}
-              style={{ width: `${100 / cardsToShow}%` }}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ 
-                duration: 0.5, 
-                delay: index * 0.1,
-                type: "spring",
-                stiffness: 100 
-              }}
-            >
-              <TestimonialCard review={review} />
-            </motion.div>
-          ))}
+          <motion.div 
+            className="flex transition-all duration-500 ease-out"
+            animate={{
+              x: `-${currentIndexTop * (100 / cardsToShow)}%`
+            }}
+            transition={{ type: "spring", stiffness: 70, damping: 20 }}
+          >
+            {topRow.map((review, index) => (
+              <motion.div 
+                key={review.id} 
+                className={`w-full px-2`}
+                style={{ width: `${100 / cardsToShow}%` }}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 100 
+                }}
+              >
+                <TestimonialCard review={review} />
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
       
-      {/* Pagination dots */}
-      {reviews.length > cardsToShow && (
-        <div className="flex justify-center mt-8 space-x-2">
-          {Array.from({ length: reviews.length - cardsToShow + 1 }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                currentIndex === index ? 'bg-yellow-400 w-4' : 'bg-gray-600'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
+      {/* Bottom row */}
+      <div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full overflow-hidden"
+        >
+          <motion.div 
+            className="flex transition-all duration-500 ease-out"
+            animate={{
+              x: `-${currentIndexBottom * (100 / cardsToShow)}%`
+            }}
+            transition={{ type: "spring", stiffness: 70, damping: 20 }}
+          >
+            {bottomRow.map((review, index) => (
+              <motion.div 
+                key={review.id} 
+                className={`w-full px-2`}
+                style={{ width: `${100 / cardsToShow}%` }}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1 + 0.2, // slightly delayed compared to top row
+                  type: "spring",
+                  stiffness: 100 
+                }}
+              >
+                <TestimonialCard review={review} />
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 };
