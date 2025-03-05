@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Review } from "@/types/review";
 import ReviewCard from "../ReviewCard";
 import { Button } from "@/components/ui/button";
 import { Star, ArrowLeft, ArrowRight } from "lucide-react";
+import TestimonialCarousel from "./TestimonialCarousel";
 
 interface ReviewsListProps {
   reviews: Review[];
@@ -23,9 +23,8 @@ interface ReviewsListProps {
 
 const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: ReviewsListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 12; // 4x3 grid
+  const reviewsPerPage = 12; 
   
-  // Calculate pagination
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
   const indexOfLastReview = currentPage * reviewsPerPage;
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
@@ -47,7 +46,6 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
     setCurrentPage(pageNumber);
   };
 
-  // Generate pagination numbers
   const paginationNumbers = () => {
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -66,7 +64,6 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
     return pages;
   };
 
-  // Animation variants for container
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -78,7 +75,6 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
     }
   };
   
-  // Animation variants for individual reviews
   const reviewVariants = {
     hidden: { 
       opacity: 0,
@@ -111,35 +107,15 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      {/* Reviews Grid */}
       {isLoading ? (
         <div className="text-center py-12">
           <p className="text-gray-500">Loading reviews...</p>
         </div>
       ) : reviews.length > 0 ? (
         <>
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {currentReviews.map((review, index) => (
-              <motion.div
-                key={review.id}
-                variants={reviewVariants}
-                initial="hidden"
-                animate="visible"
-                whileHover="hover"
-                className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden shadow-lg"
-              >
-                <ReviewCard review={review} className="h-full bg-transparent border-0" />
-              </motion.div>
-            ))}
-          </motion.div>
+          <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
           
-          {/* Pagination */}
-          {totalPages > 1 && (
+          {false && totalPages > 1 && (
             <motion.div 
               className="flex justify-center items-center gap-2 mt-8"
               initial={{ opacity: 0 }}
