@@ -66,6 +66,45 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
     return pages;
   };
 
+  // Animation variants for container
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.2
+      }
+    }
+  };
+  
+  // Animation variants for individual reviews
+  const reviewVariants = {
+    hidden: { 
+      opacity: 0,
+      x: -40,
+      scale: 0.95
+    },
+    visible: { 
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 15,
+        stiffness: 100
+      }
+    },
+    hover: {
+      scale: 1.03,
+      boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
+      transition: {
+        type: "spring",
+        stiffness: 300
+      }
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -79,23 +118,34 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
         </div>
       ) : reviews.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {currentReviews.map((review, index) => (
               <motion.div
                 key={review.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden"
+                variants={reviewVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden shadow-lg"
               >
                 <ReviewCard review={review} className="h-full bg-transparent border-0" />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
           
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
+            <motion.div 
+              className="flex justify-center items-center gap-2 mt-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -117,7 +167,7 @@ const ReviewsList = ({ reviews, isLoading, filter, setFilter, reviewCounts }: Re
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>
-            </div>
+            </motion.div>
           )}
         </>
       ) : (

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,36 +23,65 @@ const ReviewCard = ({ review, className }: ReviewCardProps) => {
       .toUpperCase();
   };
 
+  const contentVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        delay: 0.2,
+        duration: 0.3
+      }
+    }
+  };
+
   return (
-    <Card className={cn("overflow-hidden transition-all duration-300 border-0", className)}>
+    <Card className={cn("overflow-hidden transition-all duration-300 border-0 h-full", className)}>
       <CardContent className="p-4 h-full flex flex-col">
         {/* Customer name and verification */}
-        <div className="flex items-center justify-between mb-1">
+        <motion.div 
+          className="flex items-center justify-between mb-1"
+          variants={contentVariants}
+        >
           <div className="text-yellow-500 font-medium text-sm">{review.name}</div>
           {review.verified && (
             <Badge variant="outline" className="bg-green-900 text-green-400 text-xs border-green-700">
               Verified
             </Badge>
           )}
-        </div>
+        </motion.div>
         
         {/* Star rating */}
-        <div className="mb-2">
+        <motion.div 
+          className="mb-2"
+          variants={contentVariants}
+        >
           <StarRating rating={review.rating} size={14} />
-        </div>
+        </motion.div>
         
         {/* Review title */}
-        <h4 className="font-bold text-white text-sm mb-1">{review.title}</h4>
+        <motion.h4 
+          className="font-bold text-white text-sm mb-1"
+          variants={contentVariants}
+        >
+          {review.title}
+        </motion.h4>
         
         {/* Review content */}
-        <p className="text-gray-400 text-xs flex-grow mb-2 line-clamp-4">
+        <motion.p 
+          className="text-gray-400 text-xs flex-grow mb-2 line-clamp-4"
+          variants={contentVariants}
+        >
           {review.content}
-        </p>
+        </motion.p>
         
         {/* Date */}
-        <div className="text-gray-500 text-xs mt-auto">
+        <motion.div 
+          className="text-gray-500 text-xs mt-auto"
+          variants={contentVariants}
+        >
           {format(new Date(review.created_at), 'MM/dd/yyyy')}
-        </div>
+        </motion.div>
       </CardContent>
     </Card>
   );
