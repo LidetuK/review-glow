@@ -1,9 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { Review } from '@/types/review';
 import TestimonialCard from './TestimonialCard';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TestimonialCarouselProps {
   reviews: Review[];
@@ -11,11 +10,10 @@ interface TestimonialCarouselProps {
 }
 
 const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) => {
-  const [currentIndexTop, setCurrentIndexTop] = useState(0);
-  const [currentIndexBottom, setCurrentIndexBottom] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const autoPlayIntervalTopRef = useRef<NodeJS.Timeout | null>(null);
-  const autoPlayIntervalBottomRef = useRef<NodeJS.Timeout | null>(null);
+  const topRowRef = useRef<HTMLDivElement>(null);
+  const bottomRowRef = useRef<HTMLDivElement>(null);
+  const topRowControls = useAnimation();
+  const bottomRowControls = useAnimation();
   
   // Number of cards to show based on viewport
   const getCardsToShow = () => {
@@ -29,8 +27,10 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   
-  // Split reviews for top and bottom rows
+  // Split reviews evenly for top and bottom rows
   const splitReviews = () => {
+    if (!reviews.length) return { topRow: [], bottomRow: [] };
+    
     const midpoint = Math.ceil(reviews.length / 2);
     return {
       topRow: reviews.slice(0, midpoint),
@@ -39,6 +39,20 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   };
   
   const { topRow, bottomRow } = splitReviews();
+  
+  // Duplicate reviews to create seamless infinite scroll effect
+  const duplicateReviews = (rowReviews: Review[]) => {
+    return [...rowReviews, ...rowReviews];
+  };
+  
+  const topRowReviews = duplicateReviews(topRow);
+  const bottomRowReviews = duplicateReviews(bottomRow);
+  
+  // Calculate the width of each row based on card width
+  const getRowWidth = (rowReviews: Review[]) => {
+    const cardWidth = 100 / cardsToShow; // percentage width of each card
+    return cardWidth * rowReviews.length / 2; // divide by 2 because we're showing half the duplicated array
+  };
   
   // Handle window resize
   useEffect(() => {
@@ -50,50 +64,43 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Set up auto-play for top row
+  // Set up the animation for continuous scrolling
   useEffect(() => {
-    if (isAutoPlaying && topRow.length > cardsToShow) {
-      autoPlayIntervalTopRef.current = setInterval(() => {
-        setCurrentIndexTop((prevIndex) => (prevIndex + 1) % (topRow.length - cardsToShow + 1));
-      }, 5000);
+    if (topRow.length && bottomRow.length) {
+      // Animate top row from right to left
+      const topRowAnimation = async () => {
+        const topRowWidth = getRowWidth(topRowReviews);
+        
+        await topRowControls.start({
+          x: `-${topRowWidth}%`,
+          transition: {
+            duration: topRow.length * 10, // duration based on number of cards
+            ease: "linear",
+            repeat: Infinity,
+            repeatType: "loop"
+          }
+        });
+      };
+      
+      // Animate bottom row from left to right
+      const bottomRowAnimation = async () => {
+        const bottomRowWidth = getRowWidth(bottomRowReviews);
+        
+        await bottomRowControls.start({
+          x: `${bottomRowWidth}%`,
+          transition: {
+            duration: bottomRow.length * 10, // duration based on number of cards
+            ease: "linear",
+            repeat: Infinity,
+            repeatType: "loop"
+          }
+        });
+      };
+      
+      topRowAnimation();
+      bottomRowAnimation();
     }
-    
-    return () => {
-      if (autoPlayIntervalTopRef.current) {
-        clearInterval(autoPlayIntervalTopRef.current);
-      }
-    };
-  }, [currentIndexTop, isAutoPlaying, topRow.length, cardsToShow]);
-  
-  // Set up auto-play for bottom row, slightly offset in timing
-  useEffect(() => {
-    if (isAutoPlaying && bottomRow.length > cardsToShow) {
-      autoPlayIntervalBottomRef.current = setInterval(() => {
-        setCurrentIndexBottom((prevIndex) => (prevIndex + 1) % (bottomRow.length - cardsToShow + 1));
-      }, 6000); // Different timing for visual interest
-    }
-    
-    return () => {
-      if (autoPlayIntervalBottomRef.current) {
-        clearInterval(autoPlayIntervalBottomRef.current);
-      }
-    };
-  }, [currentIndexBottom, isAutoPlaying, bottomRow.length, cardsToShow]);
-  
-  // Pause auto-play on hover
-  const pauseAutoPlay = () => setIsAutoPlaying(false);
-  const resumeAutoPlay = () => setIsAutoPlaying(true);
-  
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  }, [topRow.length, bottomRow.length, cardsToShow]);
   
   if (isLoading) {
     return (
@@ -112,80 +119,50 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   }
   
   return (
-    <div 
-      className="relative overflow-hidden py-2"
-      onMouseEnter={pauseAutoPlay}
-      onMouseLeave={resumeAutoPlay}
-    >
-      {/* Top row */}
-      <div className="mb-6">
+    <div className="relative overflow-hidden py-4">
+      {/* Top row - moves left */}
+      <div className="mb-6 overflow-hidden">
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="w-full overflow-hidden"
+          ref={topRowRef}
+          className="flex"
+          animate={topRowControls}
+          initial={{ x: "0%" }}
         >
-          <motion.div 
-            className="flex transition-all duration-500 ease-out"
-            animate={{
-              x: `-${currentIndexTop * (100 / cardsToShow)}%`
-            }}
-            transition={{ type: "spring", stiffness: 70, damping: 20 }}
-          >
-            {topRow.map((review, index) => (
-              <motion.div 
-                key={review.id} 
-                className={`w-full px-2`}
-                style={{ width: `${100 / cardsToShow}%` }}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100 
-                }}
-              >
-                <TestimonialCard review={review} />
-              </motion.div>
-            ))}
-          </motion.div>
+          {topRowReviews.map((review, index) => (
+            <motion.div 
+              key={`${review.id}-${index}`} 
+              className="px-2"
+              style={{ 
+                width: `${100 / cardsToShow}%`, 
+                flexShrink: 0 
+              }}
+            >
+              <TestimonialCard review={review} />
+            </motion.div>
+          ))}
         </motion.div>
       </div>
       
-      {/* Bottom row */}
-      <div>
+      {/* Bottom row - moves right */}
+      <div className="overflow-hidden">
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="w-full overflow-hidden"
+          ref={bottomRowRef}
+          className="flex"
+          animate={bottomRowControls}
+          initial={{ x: `-${getRowWidth(bottomRowReviews)}%` }}
         >
-          <motion.div 
-            className="flex transition-all duration-500 ease-out"
-            animate={{
-              x: `-${currentIndexBottom * (100 / cardsToShow)}%`
-            }}
-            transition={{ type: "spring", stiffness: 70, damping: 20 }}
-          >
-            {bottomRow.map((review, index) => (
-              <motion.div 
-                key={review.id} 
-                className={`w-full px-2`}
-                style={{ width: `${100 / cardsToShow}%` }}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  duration: 0.5, 
-                  delay: index * 0.1 + 0.2, // slightly delayed compared to top row
-                  type: "spring",
-                  stiffness: 100 
-                }}
-              >
-                <TestimonialCard review={review} />
-              </motion.div>
-            ))}
-          </motion.div>
+          {bottomRowReviews.map((review, index) => (
+            <motion.div 
+              key={`${review.id}-${index}`} 
+              className="px-2"
+              style={{ 
+                width: `${100 / cardsToShow}%`, 
+                flexShrink: 0 
+              }}
+            >
+              <TestimonialCard review={review} />
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </div>

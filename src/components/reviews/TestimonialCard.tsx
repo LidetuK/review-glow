@@ -43,7 +43,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
 
   return (
     <motion.div
-      className="bg-gray-900/60 p-6 rounded-xl h-full flex flex-col min-h-[240px] border border-gray-800"
+      className="bg-gray-900/70 p-6 rounded-xl h-full flex flex-col min-h-[230px] border border-gray-800 shadow-lg"
       whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0,0,0,0.3)" }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >

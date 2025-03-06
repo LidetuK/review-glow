@@ -38,7 +38,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
       </div>
       
       {/* Full-width testimonial carousel */}
-      <div className="w-full overflow-hidden px-4 mt-16">
+      <div className="w-full overflow-hidden mt-16">
         <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
       </div>
     </section>
