@@ -63,7 +63,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
           key={i}
           variant="outline"
           size="icon"
-          className={`h-8 w-8 ${i === currentPage ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-transparent text-white border-gray-700'}`}
+          className={`h-8 w-8 ${i === currentPage ? 'bg-blue-500 text-white border-blue-500' : 'bg-transparent text-white border-gray-700'}`}
           onClick={() => goToPage(i)}
         >
           {i}
@@ -83,7 +83,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
           key={totalPages}
           variant="outline"
           size="icon"
-          className={`h-8 w-8 ${totalPages === currentPage ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-transparent text-white border-gray-700'}`}
+          className={`h-8 w-8 ${totalPages === currentPage ? 'bg-blue-500 text-white border-blue-500' : 'bg-transparent text-white border-gray-700'}`}
           onClick={() => goToPage(totalPages)}
         >
           {totalPages}
@@ -131,7 +131,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
             size="icon" 
             onClick={() => goToPage(currentPage - 1)} 
             disabled={currentPage === 1}
-            className="bg-transparent border-gray-700 text-white"
+            className="bg-transparent border-gray-700 text-white hover:bg-blue-500 hover:text-white"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -143,7 +143,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
             size="icon" 
             onClick={() => goToPage(currentPage + 1)} 
             disabled={currentPage === totalPages}
-            className="bg-transparent border-gray-700 text-white"
+            className="bg-transparent border-gray-700 text-white hover:bg-blue-500 hover:text-white"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

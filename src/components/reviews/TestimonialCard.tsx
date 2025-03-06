@@ -1,8 +1,10 @@
 
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { BadgeCheck, Star } from 'lucide-react';
 import { Review } from '@/types/review';
+import { format } from 'date-fns';
 
 interface TestimonialCardProps {
   review: Review;
@@ -24,66 +26,78 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
     return colors[index];
   };
 
-  // Extract job title and company if available
-  const getJobInfo = (name: string) => {
-    // For demo purposes, generating random job titles
-    const titles = ['CEO', 'Product Manager', 'Operations Manager', 'Creative Director', 'Founder', 'COO', 'Designer', 'Developer'];
-    const companies = ['Tech Company', 'Corporate', 'Agency', 'Startup', 'Enterprise', 'Studio', 'Group', 'Collective'];
-    
-    const titleIndex = name.length % titles.length;
-    const companyIndex = (name.charCodeAt(0) + name.length) % companies.length;
-    
-    return {
-      title: titles[titleIndex],
-      company: companies[companyIndex]
-    };
-  };
-
   // Randomly determine if review is verified (since we don't have this data)
   const isVerified = review.name.length % 3 === 0; // Approximately 1/3 of reviews will show as verified
 
-  const jobInfo = getJobInfo(review.name);
+  // Format review date (using current date if not available)
+  const formatDate = (dateString?: string) => {
+    try {
+      const date = dateString ? new Date(dateString) : new Date();
+      return format(date, 'dd/MM/yy');
+    } catch (error) {
+      return format(new Date(), 'dd/MM/yy');
+    }
+  };
+
+  // Generate a review title if not available 
+  const getReviewTitle = () => {
+    const titles = [
+      "Can't believe this book is free...", 
+      "Absolutely amazing!", 
+      "Life changing advice", 
+      "Best purchase ever", 
+      "Highly recommended",
+      "A must-read!",
+      "Exceeded expectations",
+      "Worth every penny"
+    ];
+    const index = review.name.length % titles.length;
+    return titles[index];
+  };
 
   return (
     <motion.div
-      className="bg-gray-900/70 p-5 rounded-xl h-full flex flex-col min-h-[200px] border border-gray-800 shadow-lg"
+      className="bg-gray-900/90 p-5 rounded-xl h-full flex flex-col min-h-[280px] border border-gray-800 shadow-lg"
       whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0,0,0,0.3)" }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
-      {/* Stars rating at top */}
+      {/* Reviewer name and verification status at top */}
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex items-center">
+          <h4 className="font-medium text-white text-base mr-1">{review.name}</h4>
+          {isVerified && (
+            <div className="flex items-center">
+              <BadgeCheck className="h-4 w-4 text-blue-400 mr-1" />
+              <span className="text-gray-400 text-xs">Verified Reviewer</span>
+            </div>
+          )}
+        </div>
+        <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
+      </div>
+      
+      {/* Star rating */}
       <div className="flex mb-3">
         {[...Array(5)].map((_, i) => (
           <Star 
             key={i} 
-            className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
+            className={`h-5 w-5 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
           />
         ))}
       </div>
       
-      {/* Review content with quotation marks */}
-      <p className="text-gray-300 text-sm mb-4 flex-grow">
-        "{review.content.length > 120 ? `${review.content.substring(0, 120)}...` : review.content}"
-      </p>
+      {/* Review title */}
+      <h3 className="text-white font-medium text-lg mb-2">
+        {getReviewTitle()}
+        {Math.random() > 0.7 && <span className="ml-2">🤩</span>}
+      </h3>
       
-      {/* Author information at bottom */}
-      <div className="flex items-center mt-auto">
-        <Avatar className="h-8 w-8 mr-3">
-          <AvatarFallback 
-            style={{ backgroundColor: generatePlaceholderColor(review.name) }}
-            className="text-white text-xs"
-          >
-            {getInitials(review.name)}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="flex items-center">
-          <h4 className="font-medium text-white text-xs">{review.name}</h4>
-          {isVerified && (
-            <BadgeCheck className="h-3.5 w-3.5 text-blue-400 ml-1" />
-          )}
-          <p className="text-gray-400 text-[10px] block">{jobInfo.title} • {jobInfo.company}</p>
-        </div>
-      </div>
+      {/* Review content */}
+      <p className="text-gray-300 text-sm flex-grow">
+        {review.content.length > 150 ? `${review.content.substring(0, 150)}... ` : review.content}
+        {review.content.length > 150 && (
+          <span className="text-blue-400 cursor-pointer hover:underline">read more</span>
+        )}
+      </p>
     </motion.div>
   );
 };
