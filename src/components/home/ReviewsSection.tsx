@@ -24,7 +24,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
           <ReviewsHeading reviews={reviews} />
         </motion.div>
 
-        <div className="mt-10 mb-16">
+        <div className="mt-10 mb-10">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -37,8 +37,8 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
         </div>
       </div>
       
-      {/* Full-width testimonial carousel */}
-      <div className="w-full overflow-hidden mt-16">
+      {/* Full-width testimonial carousel with 6 rows */}
+      <div className="w-full overflow-hidden">
         <TestimonialCarousel reviews={reviews} isLoading={isLoading} />
       </div>
     </section>

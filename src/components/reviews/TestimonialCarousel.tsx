@@ -10,48 +10,69 @@ interface TestimonialCarouselProps {
 }
 
 const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) => {
-  const topRowRef = useRef<HTMLDivElement>(null);
-  const bottomRowRef = useRef<HTMLDivElement>(null);
-  const topRowControls = useAnimation();
-  const bottomRowControls = useAnimation();
+  const rowRefs = [
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null),
+    useRef<HTMLDivElement>(null)
+  ];
+  
+  const rowControls = [
+    useAnimation(),
+    useAnimation(),
+    useAnimation(),
+    useAnimation(),
+    useAnimation(),
+    useAnimation()
+  ];
   
   // Number of cards to show based on viewport
   const getCardsToShow = () => {
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 640) return 1;  // Mobile
-      if (window.innerWidth < 1024) return 2; // Tablet
-      return 3; // Desktop
+      if (window.innerWidth < 640) return 1.5;  // Mobile
+      if (window.innerWidth < 1024) return 2.5; // Tablet
+      return 3.5; // Desktop
     }
-    return 3; // Default for SSR
+    return 3.5; // Default for SSR
   };
   
   const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   
-  // Split reviews evenly for top and bottom rows
+  // Split reviews evenly across 6 rows
   const splitReviews = () => {
-    if (!reviews.length) return { topRow: [], bottomRow: [] };
+    if (!reviews.length) return Array(6).fill([]);
     
-    const midpoint = Math.ceil(reviews.length / 2);
-    return {
-      topRow: reviews.slice(0, midpoint),
-      bottomRow: reviews.slice(midpoint)
-    };
+    // Ensure we have at least 12 reviews (2 per row)
+    const paddedReviews = [...reviews];
+    while (paddedReviews.length < 12) {
+      paddedReviews.push(...reviews);
+    }
+    
+    const rowSize = Math.ceil(paddedReviews.length / 6);
+    const rows = Array(6).fill([]).map((_, index) => {
+      const start = index * rowSize;
+      const end = start + rowSize;
+      return paddedReviews.slice(start, end);
+    });
+    
+    return rows;
   };
   
-  const { topRow, bottomRow } = splitReviews();
+  const rowsOfReviews = splitReviews();
   
   // Duplicate reviews to create seamless infinite scroll effect
   const duplicateReviews = (rowReviews: Review[]) => {
-    return [...rowReviews, ...rowReviews];
+    return [...rowReviews, ...rowReviews, ...rowReviews];
   };
   
-  const topRowReviews = duplicateReviews(topRow);
-  const bottomRowReviews = duplicateReviews(bottomRow);
+  const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row));
   
   // Calculate the width of each row based on card width
   const getRowWidth = (rowReviews: Review[]) => {
     const cardWidth = 100 / cardsToShow; // percentage width of each card
-    return cardWidth * rowReviews.length / 2; // divide by 2 because we're showing half the duplicated array
+    return cardWidth * rowReviews.length / 3; // divide by 3 because we're showing a third of the duplicated array
   };
   
   // Handle window resize
@@ -66,41 +87,41 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Set up the animation for continuous scrolling
   useEffect(() => {
-    if (topRow.length && bottomRow.length) {
-      // Animate top row from right to left
-      const topRowAnimation = async () => {
-        const topRowWidth = getRowWidth(topRowReviews);
-        
-        await topRowControls.start({
-          x: `-${topRowWidth}%`,
-          transition: {
-            duration: topRow.length * 10, // duration based on number of cards
-            ease: "linear",
-            repeat: Infinity,
-            repeatType: "loop"
+    if (reviews.length) {
+      rowsOfReviews.forEach((rowReviews, index) => {
+        const animate = async () => {
+          const rowWidth = getRowWidth(duplicatedRows[index]);
+          const isEvenRow = index % 2 === 0;
+          
+          // Even rows (0, 2, 4) move left, odd rows (1, 3, 5) move right
+          if (isEvenRow) {
+            await rowControls[index].start({
+              x: `-${rowWidth}%`,
+              transition: {
+                duration: rowReviews.length * 15, // duration based on number of cards
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop"
+              }
+            });
+          } else {
+            // Start from the right (negative position) and move to the left
+            await rowControls[index].start({
+              x: `${rowWidth}%`,
+              transition: {
+                duration: rowReviews.length * 15, // duration based on number of cards
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop"
+              }
+            });
           }
-        });
-      };
-      
-      // Animate bottom row from left to right
-      const bottomRowAnimation = async () => {
-        const bottomRowWidth = getRowWidth(bottomRowReviews);
+        };
         
-        await bottomRowControls.start({
-          x: `${bottomRowWidth}%`,
-          transition: {
-            duration: bottomRow.length * 10, // duration based on number of cards
-            ease: "linear",
-            repeat: Infinity,
-            repeatType: "loop"
-          }
-        });
-      };
-      
-      topRowAnimation();
-      bottomRowAnimation();
+        animate();
+      });
     }
-  }, [topRow.length, bottomRow.length, cardsToShow]);
+  }, [reviews.length, cardsToShow]);
   
   if (isLoading) {
     return (
@@ -120,51 +141,32 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   return (
     <div className="relative overflow-hidden py-4">
-      {/* Top row - moves left */}
-      <div className="mb-6 overflow-hidden">
-        <motion.div
-          ref={topRowRef}
-          className="flex"
-          animate={topRowControls}
-          initial={{ x: "0%" }}
-        >
-          {topRowReviews.map((review, index) => (
-            <motion.div 
-              key={`${review.id}-${index}`} 
-              className="px-2"
-              style={{ 
-                width: `${100 / cardsToShow}%`, 
-                flexShrink: 0 
-              }}
+      {duplicatedRows.map((rowReviews, rowIndex) => {
+        const isEvenRow = rowIndex % 2 === 0;
+        return (
+          <div key={`row-${rowIndex}`} className="mb-6 overflow-hidden">
+            <motion.div
+              ref={rowRefs[rowIndex]}
+              className="flex"
+              animate={rowControls[rowIndex]}
+              initial={{ x: isEvenRow ? "0%" : `-${getRowWidth(rowReviews)}%` }}
             >
-              <TestimonialCard review={review} />
+              {rowReviews.map((review, index) => (
+                <motion.div 
+                  key={`${review.id}-${rowIndex}-${index}`} 
+                  className="px-2"
+                  style={{ 
+                    width: `${100 / cardsToShow}%`, 
+                    flexShrink: 0 
+                  }}
+                >
+                  <TestimonialCard review={review} />
+                </motion.div>
+              ))}
             </motion.div>
-          ))}
-        </motion.div>
-      </div>
-      
-      {/* Bottom row - moves right */}
-      <div className="overflow-hidden">
-        <motion.div
-          ref={bottomRowRef}
-          className="flex"
-          animate={bottomRowControls}
-          initial={{ x: `-${getRowWidth(bottomRowReviews)}%` }}
-        >
-          {bottomRowReviews.map((review, index) => (
-            <motion.div 
-              key={`${review.id}-${index}`} 
-              className="px-2"
-              style={{ 
-                width: `${100 / cardsToShow}%`, 
-                flexShrink: 0 
-              }}
-            >
-              <TestimonialCard review={review} />
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
