@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Review } from '@/types/review';
@@ -45,8 +44,8 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Ensure we have enough reviews for smooth continuous looping
   const ensureEnoughReviews = (rowReviews: Review[]) => {
-    // We need at least 15 reviews per row for smooth looping (increased from 10)
-    const minLength = 15;
+    // We need at least 20 reviews per row for smoother looping (increased from 15)
+    const minLength = 20;
     if (rowReviews.length < minLength) {
       // Duplicate reviews until we have enough
       const duplicated = [...rowReviews];
@@ -62,9 +61,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   const splitReviews = () => {
     if (!reviews.length) return Array(6).fill([]);
     
-    // Ensure we have at least 24 reviews (4 per row) - increased from 18
+    // Ensure we have at least 30 reviews (5 per row) - increased from 24
     const paddedReviews = [...reviews];
-    while (paddedReviews.length < 24) {
+    while (paddedReviews.length < 30) {
       paddedReviews.push(...reviews);
     }
     
@@ -84,10 +83,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   const rowsOfReviews = splitReviews();
   
-  // Duplicate reviews to create seamless infinite scroll effect
+  // Quintuple the reviews to create seamless infinite scroll effect (increased from quadruple)
   const duplicateReviews = (rowReviews: Review[]) => {
-    // Triple the reviews to ensure we have enough content for looping
-    return [...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews]; // Quadruple now instead of triple
+    return [...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews];
   };
   
   const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row));
@@ -95,7 +93,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   // Calculate the width of each row based on card width
   const getRowWidth = (rowReviews: Review[]) => {
     const cardWidth = 100 / cardsToShow; // percentage width of each card
-    return cardWidth * rowReviews.length / 4; // divide by 4 because we're quadrupling the array
+    return cardWidth * rowReviews.length / 5; // divide by 5 because we're quintupling the array
   };
   
   // Handle window resize
@@ -108,9 +106,13 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Check if a row is special (needs adjusted timing)
-  const isSpecialRow = (index: number) => {
-    return index === 1 || index === 3; // Rows 2 and 4
+  // Check if a row needs special timing (rows 2 and 4)
+  const getRowSpeedMultiplier = (index: number) => {
+    // Rows 2 and 4 (indices 1 and 3) get even more special treatment
+    if (index === 1 || index === 3) return 0.65;
+    // Other odd rows (reverse direction) get slight speed adjustment
+    if (index % 2 === 1) return 0.85;
+    return 1;
   };
   
   // Function to start animation for a specific row
@@ -118,11 +120,10 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     const rowReviews = rowsOfReviews[index];
     const rowWidth = getRowWidth(duplicatedRows[index]);
     const isEvenRow = index % 2 === 0;
-    const baseSpeed = 15; // Base speed for animation
+    const baseSpeed = 18; // Base speed for animation (slowed down slightly)
     
-    // Special handling for rows 2 and 4 (indices 1 and 3)
-    // We speed them up slightly to ensure no gaps
-    const speedMultiplier = isSpecialRow(index) ? 0.7 : 1;
+    // Apply special timing for certain rows
+    const speedMultiplier = getRowSpeedMultiplier(index);
     const duration = rowReviews.length * baseSpeed * speedMultiplier;
     
     if (isEvenRow) {
@@ -148,9 +149,15 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     }
   };
   
-  // Pause animation for a specific row
+  // Pause animation for a specific row with smooth stopping
   const pauseRowAnimation = (index: number) => {
-    rowControls[index].stop();
+    // Get current position and pause there
+    const currentX = rowRefs[index].current?.style.transform;
+    if (currentX) {
+      rowControls[index].stop();
+    } else {
+      rowControls[index].stop();
+    }
   };
   
   // Start all animations
@@ -162,9 +169,14 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
         }
       });
     }
+    
+    // Restart animations when component unmounts and remounts
+    return () => {
+      rowControls.forEach(control => control.stop());
+    };
   }, [reviews.length, cardsToShow, hoveredRow]);
   
-  // Handle row hover events
+  // Handle row hover events with improved transitions
   const handleRowMouseEnter = (index: number) => {
     setHoveredRow(index);
     pauseRowAnimation(index);
@@ -175,7 +187,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     startRowAnimation(index);
   };
   
-  // Restart animations when window is focused
+  // Restart animations when window is focused or after visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && reviews.length) {

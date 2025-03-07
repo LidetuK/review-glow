@@ -49,9 +49,10 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
     return titles[index];
   };
 
-  // Enhanced list of negative patterns to detect potentially harmful content
+  // Enhanced comprehensive list of negative patterns to detect potentially harmful content
   const containsNegativeContent = (content: string) => {
     const negativePatterns = [
+      // General negative terms
       'terrible', 'awful', 'horrible', 'worst', 'bad', 'hate', 'dislike', 
       'disappointing', 'waste', 'useless', 'scam', 'fraud', 'refund',
       'poor quality', 'not worth', 'regret', 'unhappy', 'dissatisfied',
@@ -60,12 +61,34 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
       'avoid', 'stay away', 'don\'t buy', 'unprofessional', 'dishonest',
       'lying', 'incomplete', 'missing', 'problem', 'error', 'mistake',
       'not as described', 'faulty', 'damaged', 'return', 'complained',
-      'upset', 'angry', 'furious', 'ridiculous', 'joke'
+      'upset', 'angry', 'furious', 'ridiculous', 'joke',
+      
+      // Profanity and offensive language
+      'fuck', 'shit', 'damn', 'crap', 'ass', 'hell', 'bitch', 'bastard', 
+      'wtf', 'stfu', 'omfg', 'ffs', 'ffs', 'bullshit', 'piss',
+      
+      // Slurs and discriminatory language
+      'racist', 'sexist', 'homophobic', 'transphobic', 'bigot', 'discrimination',
+      
+      // Additional negative expressions
+      'pathetic', 'garbage', 'junk', 'trash', 'stupid', 'dumb', 'idiot', 
+      'lame', 'mediocre', 'boring', 'dull', 'confusing', 'pointless',
+      'disaster', 'catastrophe', 'nightmare', 'fiasco', 'mess', 'shambles',
+      'letdown', 'disappointing', 'unacceptable', 'unsatisfactory',
+      'inferior', 'subpar', 'second-rate', 'third-rate', 'unworthy',
+      'rip-off', 'con', 'swindle', 'cheat', 'dubious', 'suspicious',
+      'flawed', 'imperfect', 'buggy', 'glitchy', 'unreliable',
+      'annoying', 'irritating', 'frustrating', 'aggravating',
+      'yikes', 'oof', 'meh', 'bleh', 'ugh', 'eww', 'gross'
     ];
     
-    return negativePatterns.some(pattern => 
-      content.toLowerCase().includes(pattern.toLowerCase())
-    );
+    const lowerContent = content.toLowerCase();
+    
+    // Check for exact matches and word boundaries
+    return negativePatterns.some(pattern => {
+      const regex = new RegExp(`\\b${pattern}\\b`, 'i');
+      return regex.test(lowerContent);
+    });
   };
 
   const isNegative = containsNegativeContent(review.content);
@@ -89,7 +112,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
         <div className="flex flex-col">
           <div className="flex items-center">
             <h4 className="font-medium text-white text-base mr-1.5">{review.name}</h4>
-            <BadgeCheck className="h-7 w-7 text-blue-500" /> {/* Increased size here to h-7 w-7 */}
+            <BadgeCheck className="h-7 w-7 text-blue-500" />
           </div>
           <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
         </div>
