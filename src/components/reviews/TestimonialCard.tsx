@@ -49,12 +49,18 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
     return titles[index];
   };
 
-  // Check if review contains potentially negative content
+  // Enhanced list of negative patterns to detect potentially harmful content
   const containsNegativeContent = (content: string) => {
     const negativePatterns = [
       'terrible', 'awful', 'horrible', 'worst', 'bad', 'hate', 'dislike', 
       'disappointing', 'waste', 'useless', 'scam', 'fraud', 'refund',
-      'poor quality', 'not worth', 'regret'
+      'poor quality', 'not worth', 'regret', 'unhappy', 'dissatisfied',
+      'broken', 'defective', 'sucks', 'low quality', 'cheap', 'overpriced',
+      'misleading', 'false', 'ineffective', 'doesn\'t work', 'failed',
+      'avoid', 'stay away', 'don\'t buy', 'unprofessional', 'dishonest',
+      'lying', 'incomplete', 'missing', 'problem', 'error', 'mistake',
+      'not as described', 'faulty', 'damaged', 'return', 'complained',
+      'upset', 'angry', 'furious', 'ridiculous', 'joke'
     ];
     
     return negativePatterns.some(pattern => 
