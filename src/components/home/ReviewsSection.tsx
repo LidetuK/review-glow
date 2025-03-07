@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Review } from '@/types/review';
@@ -43,7 +42,7 @@ const ReviewsSection = ({ reviews, isLoading, onSubmitReview }: ReviewsSectionPr
           key={1}
           variant="outline"
           size="icon"
-          className={`h-8 w-8 ${1 === currentPage ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-transparent text-white border-gray-700'}`}
+          className={`h-8 w-8 ${1 === currentPage ? 'bg-blue-500 text-white border-blue-500' : 'bg-transparent text-white border-gray-700'}`}
           onClick={() => goToPage(1)}
         >
           1

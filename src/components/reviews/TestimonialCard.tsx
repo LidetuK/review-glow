@@ -1,6 +1,6 @@
+
 import { motion } from 'framer-motion';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { BadgeCheck, Star } from 'lucide-react';
 import { Review } from '@/types/review';
 import { format } from 'date-fns';
@@ -24,8 +24,6 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
     return colors[index];
   };
 
-  const isVerified = review.name.length % 3 === 0;
-
   const formatDate = (dateString?: string) => {
     try {
       const date = dateString ? new Date(dateString) : new Date();
@@ -44,7 +42,8 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
       "Highly recommended",
       "A must-read!",
       "Exceeded expectations",
-      "Worth every penny"
+      "Worth every penny",
+      "Good Book"
     ];
     const index = review.name.length % titles.length;
     return titles[index];
@@ -56,12 +55,23 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
       whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0,0,0,0.3)" }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex items-center">
-          <h4 className="font-medium text-white text-base mr-1">{review.name}</h4>
-          <BadgeCheck className="h-4 w-4 text-blue-400" />
+      <div className="flex items-center gap-3 mb-3">
+        <Avatar className="h-10 w-10 border-2 border-blue-500">
+          <AvatarFallback 
+            style={{ backgroundColor: generatePlaceholderColor(review.name) }}
+            className="text-white font-medium"
+          >
+            {getInitials(review.name)}
+          </AvatarFallback>
+        </Avatar>
+        
+        <div className="flex flex-col">
+          <div className="flex items-center">
+            <h4 className="font-medium text-white text-base mr-1.5">{review.name}</h4>
+            <BadgeCheck className="h-5 w-5 text-blue-500" />
+          </div>
+          <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
         </div>
-        <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
       </div>
       
       <div className="flex mb-3">

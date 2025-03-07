@@ -44,9 +44,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   const splitReviews = () => {
     if (!reviews.length) return Array(6).fill([]);
     
-    // Ensure we have at least 12 reviews (2 per row)
+    // Ensure we have at least 18 reviews (3 per row)
     const paddedReviews = [...reviews];
-    while (paddedReviews.length < 12) {
+    while (paddedReviews.length < 18) {
       paddedReviews.push(...reviews);
     }
     
@@ -54,7 +54,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     const rows = Array(6).fill([]).map((_, index) => {
       const start = index * rowSize;
       const end = start + rowSize;
-      return paddedReviews.slice(start, end);
+      // For every even-indexed row (2nd, 4th, 6th), reverse the array to create visual diversity
+      const slicedReviews = paddedReviews.slice(start, end);
+      return index % 2 === 1 ? [...slicedReviews].reverse() : slicedReviews;
     });
     
     return rows;
@@ -121,6 +123,47 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
         animate();
       });
     }
+  }, [reviews.length, cardsToShow]);
+  
+  // Restart animations when window is focused
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && reviews.length) {
+        rowsOfReviews.forEach((rowReviews, index) => {
+          const animate = async () => {
+            const rowWidth = getRowWidth(duplicatedRows[index]);
+            const isEvenRow = index % 2 === 0;
+            
+            if (isEvenRow) {
+              await rowControls[index].start({
+                x: `-${rowWidth}%`,
+                transition: {
+                  duration: rowReviews.length * 15,
+                  ease: "linear",
+                  repeat: Infinity,
+                  repeatType: "loop"
+                }
+              });
+            } else {
+              await rowControls[index].start({
+                x: `${rowWidth}%`,
+                transition: {
+                  duration: rowReviews.length * 15,
+                  ease: "linear",
+                  repeat: Infinity,
+                  repeatType: "loop"
+                }
+              });
+            }
+          };
+          
+          animate();
+        });
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [reviews.length, cardsToShow]);
   
   if (isLoading) {
