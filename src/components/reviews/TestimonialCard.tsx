@@ -49,6 +49,21 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
     return titles[index];
   };
 
+  // Check if review contains potentially negative content
+  const containsNegativeContent = (content: string) => {
+    const negativePatterns = [
+      'terrible', 'awful', 'horrible', 'worst', 'bad', 'hate', 'dislike', 
+      'disappointing', 'waste', 'useless', 'scam', 'fraud', 'refund',
+      'poor quality', 'not worth', 'regret'
+    ];
+    
+    return negativePatterns.some(pattern => 
+      content.toLowerCase().includes(pattern.toLowerCase())
+    );
+  };
+
+  const isNegative = containsNegativeContent(review.content);
+
   return (
     <motion.div
       className="bg-gray-900/90 p-5 rounded-xl h-full flex flex-col min-h-[280px] border border-gray-800 shadow-lg"
@@ -68,7 +83,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
         <div className="flex flex-col">
           <div className="flex items-center">
             <h4 className="font-medium text-white text-base mr-1.5">{review.name}</h4>
-            <BadgeCheck className="h-5 w-5 text-blue-500" />
+            <BadgeCheck className="h-6 w-6 text-blue-500" /> {/* Increased size here */}
           </div>
           <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
         </div>
@@ -88,12 +103,18 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
         {Math.random() > 0.7 && <span className="ml-2">🤩</span>}
       </h3>
       
-      <p className="text-gray-300 text-sm flex-grow">
-        {review.content.length > 150 ? `${review.content.substring(0, 150)}... ` : review.content}
-        {review.content.length > 150 && (
-          <span className="text-blue-400 cursor-pointer hover:underline">read more</span>
-        )}
-      </p>
+      {isNegative ? (
+        <p className="text-amber-400 text-sm flex-grow italic">
+          This review has been flagged for moderation.
+        </p>
+      ) : (
+        <p className="text-gray-300 text-sm flex-grow">
+          {review.content.length > 150 ? `${review.content.substring(0, 150)}... ` : review.content}
+          {review.content.length > 150 && (
+            <span className="text-blue-400 cursor-pointer hover:underline">read more</span>
+          )}
+        </p>
+      )}
     </motion.div>
   );
 };

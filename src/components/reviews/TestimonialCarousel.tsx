@@ -40,6 +40,21 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   
+  // Ensure we have enough reviews for smooth continuous looping
+  const ensureEnoughReviews = (rowReviews: Review[]) => {
+    // We need at least 10 reviews per row for smooth looping
+    const minLength = 10;
+    if (rowReviews.length < minLength) {
+      // Duplicate reviews until we have enough
+      const duplicated = [...rowReviews];
+      while (duplicated.length < minLength) {
+        duplicated.push(...rowReviews);
+      }
+      return duplicated;
+    }
+    return rowReviews;
+  };
+  
   // Split reviews evenly across 6 rows
   const splitReviews = () => {
     if (!reviews.length) return Array(6).fill([]);
@@ -56,7 +71,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
       const end = start + rowSize;
       // For every even-indexed row (2nd, 4th, 6th), reverse the array to create visual diversity
       const slicedReviews = paddedReviews.slice(start, end);
-      return index % 2 === 1 ? [...slicedReviews].reverse() : slicedReviews;
+      const finalReviews = index % 2 === 1 ? [...slicedReviews].reverse() : slicedReviews;
+      // Ensure each row has enough reviews for smooth looping
+      return ensureEnoughReviews(finalReviews);
     });
     
     return rows;
@@ -66,6 +83,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Duplicate reviews to create seamless infinite scroll effect
   const duplicateReviews = (rowReviews: Review[]) => {
+    // Triple the reviews to ensure we have enough content for looping
     return [...rowReviews, ...rowReviews, ...rowReviews];
   };
   
@@ -94,13 +112,17 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
         const animate = async () => {
           const rowWidth = getRowWidth(duplicatedRows[index]);
           const isEvenRow = index % 2 === 0;
+          const speed = 15; // Base speed for animation
           
           // Even rows (0, 2, 4) move left, odd rows (1, 3, 5) move right
+          // We make sure special attention is paid to rows 2 and 4 (index 1 and 3)
+          const duration = rowReviews.length * (index === 1 || index === 3 ? speed * 0.8 : speed);
+          
           if (isEvenRow) {
             await rowControls[index].start({
               x: `-${rowWidth}%`,
               transition: {
-                duration: rowReviews.length * 15, // duration based on number of cards
+                duration: duration,
                 ease: "linear",
                 repeat: Infinity,
                 repeatType: "loop"
@@ -111,7 +133,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
             await rowControls[index].start({
               x: `${rowWidth}%`,
               transition: {
-                duration: rowReviews.length * 15, // duration based on number of cards
+                duration: duration,
                 ease: "linear",
                 repeat: Infinity,
                 repeatType: "loop"
@@ -133,12 +155,14 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
           const animate = async () => {
             const rowWidth = getRowWidth(duplicatedRows[index]);
             const isEvenRow = index % 2 === 0;
+            const speed = 15;
+            const duration = rowReviews.length * (index === 1 || index === 3 ? speed * 0.8 : speed);
             
             if (isEvenRow) {
               await rowControls[index].start({
                 x: `-${rowWidth}%`,
                 transition: {
-                  duration: rowReviews.length * 15,
+                  duration: duration,
                   ease: "linear",
                   repeat: Infinity,
                   repeatType: "loop"
@@ -148,7 +172,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
               await rowControls[index].start({
                 x: `${rowWidth}%`,
                 transition: {
-                  duration: rowReviews.length * 15,
+                  duration: duration,
                   ease: "linear",
                   repeat: Infinity,
                   repeatType: "loop"
