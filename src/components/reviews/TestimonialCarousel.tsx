@@ -42,8 +42,8 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Ensure we have enough reviews for smooth continuous looping
   const ensureEnoughReviews = (rowReviews: Review[]) => {
-    // We need at least 10 reviews per row for smooth looping
-    const minLength = 10;
+    // We need at least 15 reviews per row for smooth looping (increased from 10)
+    const minLength = 15;
     if (rowReviews.length < minLength) {
       // Duplicate reviews until we have enough
       const duplicated = [...rowReviews];
@@ -59,9 +59,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   const splitReviews = () => {
     if (!reviews.length) return Array(6).fill([]);
     
-    // Ensure we have at least 18 reviews (3 per row)
+    // Ensure we have at least 24 reviews (4 per row) - increased from 18
     const paddedReviews = [...reviews];
-    while (paddedReviews.length < 18) {
+    while (paddedReviews.length < 24) {
       paddedReviews.push(...reviews);
     }
     
@@ -84,7 +84,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   // Duplicate reviews to create seamless infinite scroll effect
   const duplicateReviews = (rowReviews: Review[]) => {
     // Triple the reviews to ensure we have enough content for looping
-    return [...rowReviews, ...rowReviews, ...rowReviews];
+    return [...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews]; // Quadruple now instead of triple
   };
   
   const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row));
@@ -92,7 +92,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   // Calculate the width of each row based on card width
   const getRowWidth = (rowReviews: Review[]) => {
     const cardWidth = 100 / cardsToShow; // percentage width of each card
-    return cardWidth * rowReviews.length / 3; // divide by 3 because we're showing a third of the duplicated array
+    return cardWidth * rowReviews.length / 4; // divide by 4 because we're quadrupling the array
   };
   
   // Handle window resize
@@ -105,6 +105,11 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
+  // Check if a row is special (needs adjusted timing)
+  const isSpecialRow = (index: number) => {
+    return index === 1 || index === 3; // Rows 2 and 4
+  };
+  
   // Set up the animation for continuous scrolling
   useEffect(() => {
     if (reviews.length) {
@@ -112,11 +117,12 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
         const animate = async () => {
           const rowWidth = getRowWidth(duplicatedRows[index]);
           const isEvenRow = index % 2 === 0;
-          const speed = 15; // Base speed for animation
+          const baseSpeed = 15; // Base speed for animation
           
-          // Even rows (0, 2, 4) move left, odd rows (1, 3, 5) move right
-          // We make sure special attention is paid to rows 2 and 4 (index 1 and 3)
-          const duration = rowReviews.length * (index === 1 || index === 3 ? speed * 0.8 : speed);
+          // Special handling for rows 2 and 4 (indices 1 and 3)
+          // We speed them up slightly to ensure no gaps
+          const speedMultiplier = isSpecialRow(index) ? 0.7 : 1;
+          const duration = rowReviews.length * baseSpeed * speedMultiplier;
           
           if (isEvenRow) {
             await rowControls[index].start({
@@ -155,8 +161,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
           const animate = async () => {
             const rowWidth = getRowWidth(duplicatedRows[index]);
             const isEvenRow = index % 2 === 0;
-            const speed = 15;
-            const duration = rowReviews.length * (index === 1 || index === 3 ? speed * 0.8 : speed);
+            const baseSpeed = 15;
+            const speedMultiplier = isSpecialRow(index) ? 0.7 : 1;
+            const duration = rowReviews.length * baseSpeed * speedMultiplier;
             
             if (isEvenRow) {
               await rowControls[index].start({

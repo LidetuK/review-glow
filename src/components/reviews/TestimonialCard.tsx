@@ -83,7 +83,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
         <div className="flex flex-col">
           <div className="flex items-center">
             <h4 className="font-medium text-white text-base mr-1.5">{review.name}</h4>
-            <BadgeCheck className="h-6 w-6 text-blue-500" /> {/* Increased size here */}
+            <BadgeCheck className="h-7 w-7 text-blue-500" /> {/* Increased size here to h-7 w-7 */}
           </div>
           <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
         </div>
