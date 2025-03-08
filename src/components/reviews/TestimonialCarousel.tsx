@@ -44,8 +44,8 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Ensure we have enough reviews for smooth continuous looping
   const ensureEnoughReviews = (rowReviews: Review[]) => {
-    // We need at least 20 reviews per row for smoother looping (increased from 15)
-    const minLength = 20;
+    // We need at least 25 reviews per row for smoother looping (increased from 20)
+    const minLength = 25;
     if (rowReviews.length < minLength) {
       // Duplicate reviews until we have enough
       const duplicated = [...rowReviews];
@@ -61,9 +61,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   const splitReviews = () => {
     if (!reviews.length) return Array(6).fill([]);
     
-    // Ensure we have at least 30 reviews (5 per row) - increased from 24
+    // Ensure we have at least 36 reviews (6 per row) - increased from 30
     const paddedReviews = [...reviews];
-    while (paddedReviews.length < 30) {
+    while (paddedReviews.length < 36) {
       paddedReviews.push(...reviews);
     }
     
@@ -83,9 +83,9 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   const rowsOfReviews = splitReviews();
   
-  // Quintuple the reviews to create seamless infinite scroll effect (increased from quadruple)
+  // Sextuple the reviews to create seamless infinite scroll effect (increased from quintuple)
   const duplicateReviews = (rowReviews: Review[]) => {
-    return [...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews];
+    return [...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews];
   };
   
   const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row));
@@ -93,7 +93,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   // Calculate the width of each row based on card width
   const getRowWidth = (rowReviews: Review[]) => {
     const cardWidth = 100 / cardsToShow; // percentage width of each card
-    return cardWidth * rowReviews.length / 5; // divide by 5 because we're quintupling the array
+    return cardWidth * rowReviews.length / 6; // divide by 6 because we're sextupling the array
   };
   
   // Handle window resize
@@ -108,10 +108,10 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Check if a row needs special timing (rows 2 and 4)
   const getRowSpeedMultiplier = (index: number) => {
-    // Rows 2 and 4 (indices 1 and 3) get even more special treatment
-    if (index === 1 || index === 3) return 0.65;
+    // Rows 2 and 4 (indices 1 and 3) need even slower timing
+    if (index === 1 || index === 3) return 0.6;
     // Other odd rows (reverse direction) get slight speed adjustment
-    if (index % 2 === 1) return 0.85;
+    if (index % 2 === 1) return 0.8;
     return 1;
   };
   
@@ -120,7 +120,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     const rowReviews = rowsOfReviews[index];
     const rowWidth = getRowWidth(duplicatedRows[index]);
     const isEvenRow = index % 2 === 0;
-    const baseSpeed = 18; // Base speed for animation (slowed down slightly)
+    const baseSpeed = 15; // Adjusted base speed for animation (slowed down)
     
     // Apply special timing for certain rows
     const speedMultiplier = getRowSpeedMultiplier(index);
@@ -151,13 +151,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Pause animation for a specific row with smooth stopping
   const pauseRowAnimation = (index: number) => {
-    // Get current position and pause there
-    const currentX = rowRefs[index].current?.style.transform;
-    if (currentX) {
-      rowControls[index].stop();
-    } else {
-      rowControls[index].stop();
-    }
+    rowControls[index].stop();
   };
   
   // Start all animations
@@ -202,6 +196,22 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [reviews.length, cardsToShow, hoveredRow]);
+  
+  // Additional reset function to prevent stuck animations
+  useEffect(() => {
+    const resetIntervalMs = 30000; // Reset animations every 30 seconds
+    
+    const resetInterval = setInterval(() => {
+      if (hoveredRow === null && reviews.length) {
+        rowsOfReviews.forEach((_, index) => {
+          rowControls[index].stop();
+          startRowAnimation(index);
+        });
+      }
+    }, resetIntervalMs);
+    
+    return () => clearInterval(resetInterval);
+  }, [reviews.length, hoveredRow]);
   
   if (isLoading) {
     return (
