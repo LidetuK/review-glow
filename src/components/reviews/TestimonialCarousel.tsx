@@ -1,7 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+
+import { useState, useEffect } from 'react';
+import { useAnimation } from 'framer-motion';
 import { Review } from '@/types/review';
-import TestimonialCard from './TestimonialCard';
+import CarouselRow from './carousel/CarouselRow';
+import { 
+  getCardsToShow, 
+  splitReviews, 
+  duplicateReviews 
+} from './carousel/carouselUtils';
+import useCarouselAnimations from './carousel/useCarouselAnimations';
 
 interface TestimonialCarouselProps {
   reviews: Review[];
@@ -9,15 +16,10 @@ interface TestimonialCarouselProps {
 }
 
 const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) => {
-  const rowRefs = [
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null),
-    useRef<HTMLDivElement>(null)
-  ];
+  // Number of cards to show based on viewport
+  const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
   
+  // Create animation controls for each row
   const rowControls = [
     useAnimation(),
     useAnimation(),
@@ -26,75 +28,21 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     useAnimation(),
     useAnimation()
   ];
-
-  // Track which row is currently being hovered
-  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
-  
-  // Number of cards to show based on viewport
-  const getCardsToShow = () => {
-    if (typeof window !== 'undefined') {
-      if (window.innerWidth < 640) return 1.5;  // Mobile
-      if (window.innerWidth < 1024) return 2.5; // Tablet
-      return 3.5; // Desktop
-    }
-    return 3.5; // Default for SSR
-  };
-  
-  const [cardsToShow, setCardsToShow] = useState(getCardsToShow());
-  
-  // Ensure we have enough reviews for smooth continuous looping
-  const ensureEnoughReviews = (rowReviews: Review[]) => {
-    // We need at least 25 reviews per row for smoother looping (increased from 20)
-    const minLength = 25;
-    if (rowReviews.length < minLength) {
-      // Duplicate reviews until we have enough
-      const duplicated = [...rowReviews];
-      while (duplicated.length < minLength) {
-        duplicated.push(...rowReviews);
-      }
-      return duplicated;
-    }
-    return rowReviews;
-  };
   
   // Split reviews evenly across 6 rows
-  const splitReviews = () => {
-    if (!reviews.length) return Array(6).fill([]);
-    
-    // Ensure we have at least 36 reviews (6 per row) - increased from 30
-    const paddedReviews = [...reviews];
-    while (paddedReviews.length < 36) {
-      paddedReviews.push(...reviews);
-    }
-    
-    const rowSize = Math.ceil(paddedReviews.length / 6);
-    const rows = Array(6).fill([]).map((_, index) => {
-      const start = index * rowSize;
-      const end = start + rowSize;
-      // For every even-indexed row (2nd, 4th, 6th), reverse the array to create visual diversity
-      const slicedReviews = paddedReviews.slice(start, end);
-      const finalReviews = index % 2 === 1 ? [...slicedReviews].reverse() : slicedReviews;
-      // Ensure each row has enough reviews for smooth looping
-      return ensureEnoughReviews(finalReviews);
-    });
-    
-    return rows;
-  };
+  const rowsOfReviews = splitReviews(reviews);
   
-  const rowsOfReviews = splitReviews();
-  
-  // Sextuple the reviews to create seamless infinite scroll effect (increased from quintuple)
-  const duplicateReviews = (rowReviews: Review[]) => {
-    return [...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews, ...rowReviews];
-  };
-  
+  // Sextuple the reviews to create seamless infinite scroll effect
   const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row));
   
-  // Calculate the width of each row based on card width
-  const getRowWidth = (rowReviews: Review[]) => {
-    const cardWidth = 100 / cardsToShow; // percentage width of each card
-    return cardWidth * rowReviews.length / 6; // divide by 6 because we're sextupling the array
-  };
+  // Get animation management functions
+  const { 
+    hoveredRow, 
+    startRowAnimation, 
+    pauseRowAnimation,
+    handleRowMouseEnter, 
+    handleRowMouseLeave 
+  } = useCarouselAnimations(rowsOfReviews, cardsToShow, duplicatedRows);
   
   // Handle window resize
   useEffect(() => {
@@ -106,60 +54,12 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Check if a row needs special timing (rows 2 and 4)
-  const getRowSpeedMultiplier = (index: number) => {
-    // Rows 2 and 4 (indices 1 and 3) need even slower timing
-    if (index === 1 || index === 3) return 0.6;
-    // Other odd rows (reverse direction) get slight speed adjustment
-    if (index % 2 === 1) return 0.8;
-    return 1;
-  };
-  
-  // Function to start animation for a specific row
-  const startRowAnimation = (index: number) => {
-    const rowReviews = rowsOfReviews[index];
-    const rowWidth = getRowWidth(duplicatedRows[index]);
-    const isEvenRow = index % 2 === 0;
-    const baseSpeed = 15; // Adjusted base speed for animation (slowed down)
-    
-    // Apply special timing for certain rows
-    const speedMultiplier = getRowSpeedMultiplier(index);
-    const duration = rowReviews.length * baseSpeed * speedMultiplier;
-    
-    if (isEvenRow) {
-      rowControls[index].start({
-        x: `-${rowWidth}%`,
-        transition: {
-          duration: duration,
-          ease: "linear",
-          repeat: Infinity,
-          repeatType: "loop"
-        }
-      });
-    } else {
-      rowControls[index].start({
-        x: `${rowWidth}%`,
-        transition: {
-          duration: duration,
-          ease: "linear",
-          repeat: Infinity,
-          repeatType: "loop"
-        }
-      });
-    }
-  };
-  
-  // Pause animation for a specific row with smooth stopping
-  const pauseRowAnimation = (index: number) => {
-    rowControls[index].stop();
-  };
-  
   // Start all animations
   useEffect(() => {
     if (reviews.length) {
       rowsOfReviews.forEach((_, index) => {
         if (hoveredRow !== index) {
-          startRowAnimation(index);
+          startRowAnimation(index, rowControls[index]);
         }
       });
     }
@@ -170,24 +70,13 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     };
   }, [reviews.length, cardsToShow, hoveredRow]);
   
-  // Handle row hover events with improved transitions
-  const handleRowMouseEnter = (index: number) => {
-    setHoveredRow(index);
-    pauseRowAnimation(index);
-  };
-  
-  const handleRowMouseLeave = (index: number) => {
-    setHoveredRow(null);
-    startRowAnimation(index);
-  };
-  
   // Restart animations when window is focused or after visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && reviews.length) {
         rowsOfReviews.forEach((_, index) => {
           if (hoveredRow !== index) {
-            startRowAnimation(index);
+            startRowAnimation(index, rowControls[index]);
           }
         });
       }
@@ -205,7 +94,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
       if (hoveredRow === null && reviews.length) {
         rowsOfReviews.forEach((_, index) => {
           rowControls[index].stop();
-          startRowAnimation(index);
+          startRowAnimation(index, rowControls[index]);
         });
       }
     }, resetIntervalMs);
@@ -229,39 +118,31 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     );
   }
   
+  // Custom row enter/leave handlers to manage animations
+  const onRowEnter = (index: number) => {
+    handleRowMouseEnter(index);
+    pauseRowAnimation(rowControls[index]);
+  };
+  
+  const onRowLeave = (index: number) => {
+    handleRowMouseLeave(index);
+    startRowAnimation(index, rowControls[index]);
+  };
+  
   return (
     <div className="relative overflow-hidden py-4">
-      {duplicatedRows.map((rowReviews, rowIndex) => {
-        const isEvenRow = rowIndex % 2 === 0;
-        return (
-          <div 
-            key={`row-${rowIndex}`} 
-            className="mb-6 overflow-hidden"
-            onMouseEnter={() => handleRowMouseEnter(rowIndex)}
-            onMouseLeave={() => handleRowMouseLeave(rowIndex)}
-          >
-            <motion.div
-              ref={rowRefs[rowIndex]}
-              className="flex"
-              animate={rowControls[rowIndex]}
-              initial={{ x: isEvenRow ? "0%" : `-${getRowWidth(rowReviews)}%` }}
-            >
-              {rowReviews.map((review, index) => (
-                <motion.div 
-                  key={`${review.id}-${rowIndex}-${index}`} 
-                  className="px-2"
-                  style={{ 
-                    width: `${100 / cardsToShow}%`, 
-                    flexShrink: 0 
-                  }}
-                >
-                  <TestimonialCard review={review} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        );
-      })}
+      {duplicatedRows.map((rowReviews, rowIndex) => (
+        <CarouselRow
+          key={`row-${rowIndex}`}
+          rowReviews={rowReviews}
+          rowIndex={rowIndex}
+          cardsToShow={cardsToShow}
+          isHovered={hoveredRow === rowIndex}
+          onMouseEnter={() => onRowEnter(rowIndex)}
+          onMouseLeave={() => onRowLeave(rowIndex)}
+          controls={rowControls[rowIndex]}
+        />
+      ))}
     </div>
   );
 };
