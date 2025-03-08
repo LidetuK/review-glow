@@ -1,9 +1,9 @@
 
 import { motion } from 'framer-motion';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { BadgeCheck, Star } from 'lucide-react';
 import { Review } from '@/types/review';
-import { format } from 'date-fns';
+import { ReviewAvatar } from './components/ReviewAvatar';
+import { ReviewRatingStars } from './components/ReviewRatingStars';
+import { generateReviewTitle, shouldShowEmoji } from './utils/titleGenerator';
 import { containsNegativeContent } from './utils/contentFilters';
 
 interface TestimonialCardProps {
@@ -11,52 +11,9 @@ interface TestimonialCardProps {
 }
 
 const TestimonialCard = ({ review }: TestimonialCardProps) => {
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase();
-  };
-
-  const generatePlaceholderColor = (name: string) => {
-    const colors = ['#4CAF50', '#2196F3', '#9C27B0', '#F44336', '#FF9800', '#03A9F4', '#E91E63', '#673AB7'];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
-  };
-
-  const formatDate = (dateString?: string) => {
-    try {
-      const date = dateString ? new Date(dateString) : new Date();
-      return format(date, 'dd/MM/yy');
-    } catch (error) {
-      return format(new Date(), 'dd/MM/yy');
-    }
-  };
-
-  const getReviewTitle = () => {
-    const titles = [
-      "Can't believe this book is free...", 
-      "Absolutely amazing!", 
-      "Life changing advice", 
-      "Best purchase ever", 
-      "Highly recommended",
-      "A must-read!",
-      "Exceeded expectations",
-      "Worth every penny",
-      "Good Book",
-      "Fantastic resource",
-      "Incredibly helpful",
-      "Game changer",
-      "Outstanding value",
-      "Perfect for beginners",
-      "Practical and insightful"
-    ];
-    const index = review.name.length % titles.length;
-    return titles[index];
-  };
-
   const isNegative = containsNegativeContent(review.content);
+  const reviewTitle = generateReviewTitle(review.name);
+  const showEmoji = shouldShowEmoji();
 
   return (
     <motion.div
@@ -64,37 +21,17 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
       whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0,0,0,0.3)" }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
-      <div className="flex items-center gap-3 mb-3">
-        <Avatar className="h-10 w-10 border-2 border-blue-500">
-          <AvatarFallback 
-            style={{ backgroundColor: generatePlaceholderColor(review.name) }}
-            className="text-white font-medium"
-          >
-            {getInitials(review.name)}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="flex flex-col">
-          <div className="flex items-center">
-            <h4 className="font-medium text-white text-base mr-1.5">{review.name}</h4>
-            <BadgeCheck className="h-7 w-7 text-blue-500" />
-          </div>
-          <span className="text-gray-400 text-xs">{formatDate(review.created_at)}</span>
-        </div>
-      </div>
+      <ReviewAvatar 
+        name={review.name} 
+        createdAt={review.created_at} 
+        verified={review.verified} 
+      />
       
-      <div className="flex mb-3">
-        {[...Array(5)].map((_, i) => (
-          <Star 
-            key={i} 
-            className={`h-5 w-5 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
-          />
-        ))}
-      </div>
+      <ReviewRatingStars rating={review.rating} />
       
       <h3 className="text-white font-medium text-lg mb-2">
-        {getReviewTitle()}
-        {Math.random() > 0.7 && <span className="ml-2">🤩</span>}
+        {reviewTitle}
+        {showEmoji && <span className="ml-2">🤩</span>}
       </h3>
       
       {isNegative ? (
