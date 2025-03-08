@@ -41,8 +41,8 @@ export const ReviewAvatar = ({ name, createdAt, verified = false }: ReviewAvatar
   };
 
   return (
-    <div className="flex items-center gap-3 mb-3">
-      <Avatar className="h-10 w-10 border-2 border-blue-500">
+    <div className="flex items-center gap-3">
+      <Avatar className="h-10 w-10 border-2 border-blue-500 shadow-[0_0_10px_rgba(56,189,248,0.7)] transition-all hover:shadow-[0_0_15px_rgba(56,189,248,0.9)]">
         <AvatarFallback 
           style={{ backgroundColor: generatePlaceholderColor(name) }}
           className="text-white font-medium"
@@ -53,8 +53,8 @@ export const ReviewAvatar = ({ name, createdAt, verified = false }: ReviewAvatar
       
       <div className="flex flex-col">
         <div className="flex items-center">
-          <h4 className="font-medium text-white text-base mr-1.5">{name}</h4>
-          {verified && <BadgeCheck className="h-7 w-7 text-blue-500" />}
+          <h4 className="font-medium text-white text-base mr-1.5 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 transition-all hover:from-blue-300 hover:to-cyan-200">{name}</h4>
+          {verified && <BadgeCheck className="h-7 w-7 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)] animate-pulse" />}
         </div>
         {createdAt && <span className="text-gray-400 text-xs">{formatDate(createdAt)}</span>}
       </div>
