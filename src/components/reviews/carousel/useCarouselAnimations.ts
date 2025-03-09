@@ -48,7 +48,7 @@ export const useCarouselAnimations = (
   // Pause animation for a specific row with smooth stopping
   const pauseRowAnimation = (controls: AnimationControls) => {
     // Instead of stopping abruptly, pause with a smooth deceleration
-    controls.stop({ velocity: 0.1 });
+    controls.stop(); // Removed the argument that was causing the error
   };
   
   // Handle row hover events with improved transitions
