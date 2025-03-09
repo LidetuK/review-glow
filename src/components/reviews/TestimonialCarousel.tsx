@@ -29,11 +29,23 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     useAnimation()
   ];
   
-  // Split reviews evenly across 6 rows
-  const rowsOfReviews = splitReviews(reviews);
+  // Process reviews to ensure we have enough for display
+  const processedReviews = reviews.length > 0 ? reviews : Array(6).fill({
+    id: 'placeholder',
+    rating: 5,
+    content: 'Loading review...',
+    name: 'User',
+    email: '',
+    created_at: new Date().toISOString(),
+    verified: true,
+    helpful_count: 0
+  });
   
-  // Sextuple the reviews to create seamless infinite scroll effect
-  const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row));
+  // Split reviews evenly across rows (ensuring we have enough content)
+  const rowsOfReviews = splitReviews(processedReviews);
+  
+  // Create a continuous loop effect by duplicating rows multiple times
+  const duplicatedRows = rowsOfReviews.map(row => duplicateReviews(row, 8)); // Increase duplications for smoother loops
   
   // Get animation management functions
   const { 
@@ -56,7 +68,7 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
   
   // Start all animations
   useEffect(() => {
-    if (reviews.length) {
+    if (processedReviews.length) {
       rowsOfReviews.forEach((_, index) => {
         if (hoveredRow !== index) {
           startRowAnimation(index, rowControls[index]);
@@ -68,12 +80,12 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     return () => {
       rowControls.forEach(control => control.stop());
     };
-  }, [reviews.length, cardsToShow, hoveredRow]);
+  }, [processedReviews.length, cardsToShow, hoveredRow]);
   
   // Restart animations when window is focused or after visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && reviews.length) {
+      if (document.visibilityState === 'visible' && processedReviews.length) {
         rowsOfReviews.forEach((_, index) => {
           if (hoveredRow !== index) {
             startRowAnimation(index, rowControls[index]);
@@ -84,14 +96,14 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [reviews.length, cardsToShow, hoveredRow]);
+  }, [processedReviews.length, cardsToShow, hoveredRow]);
   
   // Additional reset function to prevent stuck animations
   useEffect(() => {
-    const resetIntervalMs = 30000; // Reset animations every 30 seconds
+    const resetIntervalMs = 20000; // Reset animations every 20 seconds
     
     const resetInterval = setInterval(() => {
-      if (hoveredRow === null && reviews.length) {
+      if (hoveredRow === null && processedReviews.length) {
         rowsOfReviews.forEach((_, index) => {
           rowControls[index].stop();
           startRowAnimation(index, rowControls[index]);
@@ -100,20 +112,12 @@ const TestimonialCarousel = ({ reviews, isLoading }: TestimonialCarouselProps) =
     }, resetIntervalMs);
     
     return () => clearInterval(resetInterval);
-  }, [reviews.length, hoveredRow]);
+  }, [processedReviews.length, hoveredRow]);
   
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <p className="text-gray-400">Loading testimonials...</p>
-      </div>
-    );
-  }
-  
-  if (reviews.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-400">No reviews yet. Be the first to leave a review!</p>
       </div>
     );
   }

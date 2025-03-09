@@ -13,10 +13,10 @@ export const useCarouselAnimations = (
   
   // Function to start animation for a specific row
   const startRowAnimation = (index: number, controls: AnimationControls) => {
-    const rowReviews = rowsOfReviews[index];
-    const rowWidth = getRowWidth(duplicatedRows[index], cardsToShow);
+    const rowReviews = duplicatedRows[index]; // Use duplicated rows for more continuous animation
+    const rowWidth = getRowWidth(rowReviews, cardsToShow);
     const isEvenRow = index % 2 === 0;
-    const baseSpeed = 15; // Adjusted base speed for animation (slowed down)
+    const baseSpeed = 15; // Adjusted base speed for animation
     
     // Apply special timing for certain rows
     const speedMultiplier = getRowSpeedMultiplier(index);
@@ -47,7 +47,8 @@ export const useCarouselAnimations = (
   
   // Pause animation for a specific row with smooth stopping
   const pauseRowAnimation = (controls: AnimationControls) => {
-    controls.stop();
+    // Instead of stopping abruptly, pause with a smooth deceleration
+    controls.stop({ velocity: 0.1 });
   };
   
   // Handle row hover events with improved transitions

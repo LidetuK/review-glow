@@ -38,6 +38,16 @@ const CarouselRow = ({
         className="flex"
         animate={controls}
         initial={{ x: isEvenRow ? "0%" : `-${getRowWidth(rowReviews, cardsToShow)}%` }}
+        style={{ 
+          // Ensure enough spacing between cards
+          gap: '8px',
+          // Adding a smooth transition on hover
+          transition: 'filter 0.3s ease-in-out, transform 0.2s ease-in-out'
+        }}
+        whileHover={{
+          filter: 'brightness(1.05)', // Subtle brightness increase on hover
+          scale: 1.005, // Very slight scale up for better hover feedback
+        }}
       >
         {rowReviews.map((review, index) => (
           <motion.div 
@@ -45,7 +55,13 @@ const CarouselRow = ({
             className="px-2"
             style={{ 
               width: `${100 / cardsToShow}%`, 
-              flexShrink: 0 
+              flexShrink: 0,
+              // Ensure there's no gap
+              marginRight: '0px' 
+            }}
+            whileHover={{
+              scale: 1.02,
+              transition: { duration: 0.2 }
             }}
           >
             <TestimonialCard review={review} />
