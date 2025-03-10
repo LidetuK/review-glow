@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { Review } from '@/types/review';
 import { ReviewAvatar } from './components/ReviewAvatar';
@@ -39,7 +40,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
     >
       <ReviewRatingStars rating={review.rating} />
 
-      <p className="text-gray-300 text-sm flex-grow mb-4">
+      <p className="text-gray-300 text-sm flex-grow mb-2">
         {review.content.length > 150 ? `${review.content.substring(0, 150)}... ` : review.content}
         {review.content.length > 150 && (
           <span className="text-blue-400 cursor-pointer hover:underline">read more</span>
@@ -47,7 +48,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
       </p>
 
       {/* Avatar + Name with Verification Icon */}
-      <div className="mt-auto pt-3 border-t border-gray-800 flex items-center gap-3">
+      <div className="mt-2 pt-2 border-t border-gray-800 flex items-center gap-3">
         <ReviewAvatar name={review.name} createdAt={review.created_at} verified={review.verified} />
         <MdVerified className="text-blue-400 text-4xl ml-1" />
       </div>
