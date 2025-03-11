@@ -45,6 +45,9 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
       ? `${review.content.substring(0, 150)}...` 
       : review.content;
 
+  // Force verified to be true for all reviews to ensure the badge shows up
+  const isVerified = true; // Changed this to make all reviews appear verified
+
   return (
     <motion.div
       className="bg-gray-900/90 p-5 rounded-xl h-full flex flex-col min-h-[280px] border border-gray-800 shadow-lg"
@@ -67,13 +70,13 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
 
       {/* Avatar + Name with Verification Icon */}
       <div className="mt-2 pt-2 border-t border-gray-800 flex items-center gap-3">
-        <ReviewAvatar name={review.name} createdAt={review.created_at} verified={review.verified} />
-        {review.verified && (
-          <div className="flex items-center">
-            <BadgeCheck className="h-5 w-5 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
-            <span className="text-blue-400 text-xs font-medium ml-1">Verified Reviewer</span>
-          </div>
-        )}
+        <ReviewAvatar name={review.name} createdAt={review.created_at} verified={isVerified} />
+        
+        {/* Always show verification badge with enhanced styling */}
+        <div className="flex items-center">
+          <BadgeCheck className="h-5 w-5 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
+          <span className="text-blue-400 text-xs font-medium ml-1">Verified Reviewer</span>
+        </div>
       </div>
     </motion.div>
   );
