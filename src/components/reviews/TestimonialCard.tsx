@@ -5,7 +5,7 @@ import { Review } from '@/types/review';
 import { ReviewAvatar } from './components/ReviewAvatar';
 import { shouldShowEmoji } from './utils/titleGenerator';
 import { containsNegativeContent } from './utils/contentFilters';
-import { MdVerified } from 'react-icons/md';
+import { BadgeCheck } from 'lucide-react';
 
 interface TestimonialCardProps {
   review: Review;
@@ -70,7 +70,7 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
         <ReviewAvatar name={review.name} createdAt={review.created_at} verified={review.verified} />
         {review.verified && (
           <div className="flex items-center">
-            <MdVerified className="text-blue-400 text-lg" />
+            <BadgeCheck className="h-5 w-5 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
             <span className="text-blue-400 text-xs font-medium ml-1">Verified Reviewer</span>
           </div>
         )}
