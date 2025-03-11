@@ -26,16 +26,17 @@ export const ReviewAvatar = ({ name, createdAt, verified = false }: ReviewAvatar
   const formatDate = (dateString?: string) => {
     try {
       const date = dateString ? new Date(dateString) : new Date();
-      return new Intl.DateTimeFormat('en-GB', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: '2-digit' 
+      // Format: Month Day, Year (e.g. Jan 15, 2023)
+      return new Intl.DateTimeFormat('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
       }).format(date);
     } catch (error) {
-      return new Intl.DateTimeFormat('en-GB', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: '2-digit' 
+      return new Intl.DateTimeFormat('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
       }).format(new Date());
     }
   };
@@ -54,7 +55,7 @@ export const ReviewAvatar = ({ name, createdAt, verified = false }: ReviewAvatar
       <div className="flex flex-col">
         <div className="flex items-center">
           <h4 className="font-medium text-white text-base mr-1.5 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 transition-all hover:from-blue-300 hover:to-cyan-200">{name}</h4>
-          {verified && <BadgeCheck className="h-7 w-7 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)] animate-pulse" />}
+          {verified && <BadgeCheck className="h-4 w-4 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />}
         </div>
         {createdAt && <span className="text-gray-400 text-xs">{formatDate(createdAt)}</span>}
       </div>
