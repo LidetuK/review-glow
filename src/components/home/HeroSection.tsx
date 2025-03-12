@@ -1,9 +1,8 @@
-
 import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-gray-50 overflow-hidden py-32">
+    <section className="relative bg-gray-90 overflow-hidden py-32">
       {/* Background Gradient */}
       <div 
         className="absolute inset-0"
@@ -15,19 +14,24 @@ const HeroSection = () => {
 
       {/* Content Container */}
       <div className="container max-w-5xl mx-auto px-6 relative z-10">
-        <div className="flex flex-col items-center text-center space-y-12">
+        <div className="flex flex-col items-center text-center space-y-6">
           {/* Headline Animation */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="space-y-6"
+            className="space-y-4"
           >
             <h1 className="text-5xl md:text-6xl lg:text-[4rem] font-extrabold leading-tight tracking-tight text-gray-900">
               "Quite possibly the most 
               <span className="text-book-red drop-shadow-md"> provocative </span> 
               book ever written for developing a better mindset and achieving success..."
             </h1>
+
+            {/* Red Signature Text */}
+            <p className="text-book-red font-extrabold text-lg md:text-xl lg:text-2xl mt-2 text-right">
+  — BIZNOB
+</p>
           </motion.div>
 
           {/* Book Image Animation */}
@@ -38,7 +42,7 @@ const HeroSection = () => {
             className="w-full max-w-xl mx-auto"
           >
             <img 
-              src="/lovable-uploads/8ebd4889-d01b-480e-942a-42139c5c9167.png" 
+              src="/lovable-uploads/Elevate_Higher_Book_Mockup_3-removebg-preview.png" 
               alt="Book Cover" 
               className="rounded-lg shadow-xl"
             />

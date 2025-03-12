@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Review } from '@/types/review';
@@ -29,24 +28,19 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
   const isNegative = containsNegativeContent(review.content);
   const showEmoji = shouldShowEmoji();
 
-  // Don't render negative reviews
   if (isNegative) {
     return null;
   }
 
-  // Handle the read more functionality
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const displayContent = isExpanded 
-    ? review.content 
-    : review.content.length > 150 
-      ? `${review.content.substring(0, 150)}...` 
+  const displayContent = isExpanded
+    ? review.content
+    : review.content.length > 150
+      ? `${review.content.substring(0, 150)}...`
       : review.content;
-
-  // Force verified to be true for all reviews to ensure the badge shows up
-  const isVerified = true; // Changed this to make all reviews appear verified
 
   return (
     <motion.div
@@ -63,20 +57,16 @@ const TestimonialCard = ({ review }: TestimonialCardProps) => {
             className="text-blue-400 cursor-pointer hover:underline ml-1"
             onClick={toggleReadMore}
           >
-            {isExpanded ? 'show less' : 'read more'}
+            {isExpanded ? 'Show Less' : 'Read More'}
           </span>
         )}
       </p>
 
-      {/* Avatar + Name with Verification Icon */}
-      <div className="mt-2 pt-2 border-t border-gray-800 flex items-center gap-3">
-        <ReviewAvatar name={review.name} createdAt={review.created_at} verified={isVerified} />
-        
-        {/* Always show verification badge with enhanced styling */}
-        <div className="flex items-center">
-          <BadgeCheck className="h-5 w-5 text-blue-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
-          <span className="text-blue-400 text-xs font-medium ml-1">Verified Reviewer</span>
-        </div>
+      {/* Avatar, Name, and Verification (All in One Line) */}
+      <div className="mt-2 pt-2 border-t border-gray-800 flex items-center gap-2">
+        <ReviewAvatar name={review.name} createdAt={review.created_at} />
+       
+        <span className="text-blue-400 text-sm font-medium">Verified Reviewer</span>
       </div>
     </motion.div>
   );

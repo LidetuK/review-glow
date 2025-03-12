@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Review } from '@/types/review';
 import HeroSection from '@/components/home/HeroSection';
 import BookShowcase from '@/components/BookShowcase';
+import Footer from '@/components/Footer';
 import ReviewsSection from '@/components/home/ReviewsSection';
 import BookExperience from '@/components/BookExperience';
 
@@ -110,6 +111,7 @@ const Index = () => {
         />
       </main>
       <BookExperience />
+      <Footer/>
     </div>
   );
 };

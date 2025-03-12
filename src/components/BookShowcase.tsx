@@ -57,7 +57,7 @@ const BookShowcase = () => {
             className="flex justify-center"
           >
             <img 
-              src="/lovable-uploads/download (1).png" 
+              src="/lovable-uploads/Elevate_Higher_Book_Mockup_All-removebg-preview.png" 
               alt="Book Cover" 
               className="w-full max-w-md md:max-w-lg rounded-lg shadow-2xl"
             />

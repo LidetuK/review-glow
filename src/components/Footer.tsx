@@ -1,120 +1,97 @@
-
-import { Link } from 'react-router-dom';
-import { Star, ShieldCheck, Book, Mail, ArrowUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Link } from "react-router-dom";
+import { Facebook, Mail, Instagram, X as TwitterX, ArrowUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 const Footer = () => {
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <footer className="bg-gray-50 pt-16 pb-8 border-t">
-      <div className="container max-w-6xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between gap-8">
-          <div className="md:w-1/3">
-            <Link to="/" className="flex items-center">
-              <span className="font-bold text-2xl mr-2 text-book-red">Sell Like</span>
-              <span className="font-bold text-2xl">Crazy</span>
-            </Link>
-            <p className="text-muted-foreground mt-4">
-              Discover the marketing secrets that have helped thousands of businesses explode their sales with our bestselling book.
-            </p>
-            <div className="flex gap-4 mt-6">
-              <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-                <Mail className="h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-                <Book className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:w-2/3">
-            <div>
-              <h3 className="font-semibold text-lg mb-4">Navigation</h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link to="/" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/reviews" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Reviews
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Admin
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-4">Resources</h3>
-              <ul className="space-y-3">
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Book Preview
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Free Chapters
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Case Studies
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    FAQ
-                  </a>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-lg mb-4">Legal</h3>
-              <ul className="space-y-3">
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-muted-foreground hover:text-book-orange transition-colors">
-                    Cookie Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Sell Like Crazy. All rights reserved.
-          </p>
-          
-          <Button 
-            variant="ghost" 
-            className="mt-4 md:mt-0"
-            onClick={scrollToTop}
+    <footer className="bg-[#0a0a0a] text-white pt-20 pb-10 border-t border-gray-800">
+      <div className="container max-w-4xl mx-auto px-6 text-center">
+        {/* Subtitle - Styled Like the Image */}
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="text-white font-extrabold text-5xl md:text-6xl lg:text-[4rem] leading-tight tracking-tight"
+        >
+          <span className="text-[#FF4A3D]">Unlock</span> the{" "}
+          <span className="text-[#FF4A3D]">mindset, habits, and strategies</span>  
+          to rise above limits and create a life of{" "}
+          <span className="text-[#FF4A3D]">purpose, impact, and success.</span>
+        </motion.p>
+
+        {/* Social Media */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="flex justify-center gap-4 mt-8"
+        >
+          {/* Email */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-12 w-12 border-gray-600 hover:border-yellow-400 transition-all hover:scale-125 hover:shadow-lg hover:shadow-yellow-400/50"
+            onClick={() => window.location.href = "mailto:Booking.Reskque@gmail.com"}
           >
-            <ArrowUp className="h-4 w-4 mr-2" />
-            Back to top
+            <Mail className="h-6 w-6 text-black hover:text-yellow-400 transition-colors" />
           </Button>
+
+          {/* Twitter */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-12 w-12 border-gray-600 hover:border-yellow-400 transition-all hover:scale-125 hover:shadow-lg hover:shadow-yellow-400/50"
+            onClick={() => window.open("https://twitter.com/reskque", "_blank")}
+          >
+            <TwitterX className="h-6 w-6 text-black hover:text-yellow-400 transition-colors" />
+          </Button>
+
+          {/* Instagram */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-12 w-12 border-gray-600 hover:border-yellow-400 transition-all hover:scale-125 hover:shadow-lg hover:shadow-yellow-400/50"
+            onClick={() => window.open("https://www.instagram.com/reskque/p/DGV7ZjiOC8a/", "_blank")}
+          >
+            <Instagram className="h-6 w-6 text-black hover:text-yellow-400 transition-colors" />
+          </Button>
+
+          {/* Facebook */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-12 w-12 border-gray-600 hover:border-yellow-400 transition-all hover:scale-125 hover:shadow-lg hover:shadow-yellow-400/50"
+            onClick={() => window.open("https://www.facebook.com/ireskque/", "_blank")}
+          >
+            <Facebook className="h-6 w-6 text-black hover:text-yellow-400 transition-colors" />
+          </Button>
+        </motion.div>
+
+        {/* Bottom Section */}
+        <div className="mt-12 pt-6 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Elevate Higher. All rights reserved.
+          </p>
+
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-4 md:mt-0"
+          >
+            <Button
+              variant="ghost"
+              className="text-white hover:text-book-orange transition-all"
+              onClick={scrollToTop}
+            >
+              <ArrowUp className="h-5 w-5 mr-2" />
+              Back to top
+            </Button>
+          </motion.div>
         </div>
       </div>
     </footer>

@@ -58,7 +58,7 @@ const BookExperience = () => {
             className="relative flex justify-center"
           >
             <motion.img 
-              src="/lovable-uploads/download (1).png" 
+              src="/lovable-uploads/Elevate_Higher_Book_Mockup_4-removebg-preview.png" 
               alt="Book Cover" 
               className="w-full max-w-lg rounded-lg shadow-2xl transform transition duration-500 hover:scale-105"
               whileHover={{ rotate: 3, scale: 1.05 }}
